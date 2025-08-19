@@ -25,7 +25,7 @@ export function BlockedView(
 const styles = StyleSheet.create({
     block: {
         padding: 20,
-        borderRadius: 10,
+        borderRadius: 30,
     },
     blockShadow:{
         shadowOffset: { width: 0, height: 2 },

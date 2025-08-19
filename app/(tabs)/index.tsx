@@ -4,8 +4,9 @@ import { ThemedText } from '@/components/ThemedText'
 import { ThemedTouchableOpacity } from '@/components/ThemedTouchableOpacity'
 import { ThemedView } from '@/components/ThemedView'
 import { useState } from 'react'
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { Button, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function HomeScreen() {
 
@@ -28,8 +29,18 @@ function HomeScreen() {
     { id: 3, title: 'Mood Tracker'},
     { id: 4, title: 'Sleep Tracker'}
   ]
+
+  const clearAllData = async () => {
+    try {
+      await AsyncStorage.clear();
+      console.log('Async Storage data cleared successfully!');
+    } catch (e) {
+      console.error('Failed to clear Async Storage:', e);
+    }
+  };
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
+      <Button title='Clear data' onPress={clearAllData}/>
       <ScrollView>
 
         <View style={{ padding: 5, alignItems: 'center', gap: 10 }}>
