@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { Button, ScrollView, StyleSheet, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from "@react-native-firebase/auth"
 
 function HomeScreen() {
 
@@ -40,7 +41,10 @@ function HomeScreen() {
   };
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
+      <View style={{gap:10}}>
+        <Button title='Sign Out' onPress={() => auth().signOut()} color={'#ff0000ff'}/>
       <Button title='Clear data' onPress={clearAllData}/>
+      </View>
       <ScrollView>
 
         <View style={{ padding: 5, alignItems: 'center', gap: 10 }}>

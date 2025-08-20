@@ -9,9 +9,12 @@
     }
   },
   "include": [
+    "src/**/*",
+    "src/types/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "app/(tabs)/index.tsx"  ]
+    "expo-env.d.ts",
+    "app/(tabs)/home.tsx"
+  ]
 }

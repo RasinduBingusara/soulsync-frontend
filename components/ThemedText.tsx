@@ -16,7 +16,7 @@ export function ThemedText({
   fontColor,
   ...rest
 }: ThemedTextProps) {
-  const color = fontColor!==''? fontColor:useThemeColor({light: lightColor, dark: darkColor }, 'text');
+  const color = fontColor===''? fontColor:useThemeColor({light: lightColor, dark: darkColor }, 'text');
 
   return (
     <Text
