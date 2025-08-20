@@ -21,12 +21,12 @@ const Post = ({ id, title, content, uid, email, isAnonymouse, profileName, profi
         {
           isAnonymouse ? (
             <View style={styles.profileContainer}>
-              <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              {/* <Image source={{ uri: profileImage }} style={styles.profileImage} /> */}
               <Text style={styles.profileName}>Anonymouse</Text>
             </View>
           ) : (
             <View style={styles.profileContainer}>
-              <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              {/* <Image source={{ uri: profileImage }} style={styles.profileImage} /> */}
               <Text style={styles.profileName}>{profileName}</Text>
             </View>
           )

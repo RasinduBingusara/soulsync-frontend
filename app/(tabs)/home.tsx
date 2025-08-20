@@ -4,10 +4,20 @@ import { ThemedText } from '@/components/ThemedText'
 import { ThemedTouchableOpacity } from '@/components/ThemedTouchableOpacity'
 import { ThemedView } from '@/components/ThemedView'
 import { useState } from 'react'
-import { Button, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from "@react-native-firebase/auth"
+
+interface IfeatureBlock {
+  title: string
+}
+
+const FeatureBlock = ({ title }: IfeatureBlock) => (
+  <TouchableOpacity style={styles.featureBlock}>
+    <Text style={styles.blockTitle}>{title}</Text>
+  </TouchableOpacity>
+);
 
 function HomeScreen() {
 
@@ -25,10 +35,10 @@ function HomeScreen() {
   ]
 
   const quickTools = [
-    { id: 1, title: 'Meditation'},
-    { id: 2, title: 'Journal'},
-    { id: 3, title: 'Mood Tracker'},
-    { id: 4, title: 'Sleep Tracker'}
+    { id: 1, title: 'Meditation' },
+    { id: 2, title: 'Journal' },
+    { id: 3, title: 'Mood Tracker' },
+    { id: 4, title: 'Sleep Tracker' }
   ]
 
   const clearAllData = async () => {
@@ -41,56 +51,24 @@ function HomeScreen() {
   };
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
-      <View style={{gap:10}}>
-        <Button title='Sign Out' onPress={() => auth().signOut()} color={'#ff0000ff'}/>
-      <Button title='Clear data' onPress={clearAllData}/>
+      <View style={{ gap: 10 }}>
+        <Button title='Sign Out' onPress={() => auth().signOut()} color={'#ff0000ff'} />
+        <Button title='Clear data' onPress={clearAllData} />
       </View>
-      <ScrollView>
+      <ScrollView style={styles.scrollView}>
 
-        <View style={{ padding: 5, alignItems: 'center', gap: 10 }}>
-          <ThemedText type='title'>SoulSync</ThemedText>
-          <ThemedText type='subtitle'>Welcome, {userName}!</ThemedText>
+        <View style={styles.featureGrid}>
+          <FeatureBlock title="Emotion Recognition ✅" />
+          <FeatureBlock title="Recommendations" />
+          <FeatureBlock title="Daily Tracker" />
+          <FeatureBlock title="Journal Keeper" />
+          <FeatureBlock title="Multilingual Chatbot" />
+          <FeatureBlock title="Analysis Dashboard" />
+          <FeatureBlock title="Learning Zone" />
+          <FeatureBlock title="Supportive Community" />
         </View>
 
-        <View style={{ padding: 5, gap: 10, marginLeft: 20, marginRight: 20 }}>
-          <ThemedText type='subtitle'>Today's Focus</ThemedText>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ flexDirection: 'row', gap: 20, marginTop: 10 }}>
-            <ThemedView>
-              {todayActivities.map((activity) => (
-                <ThemedTouchableOpacity key={activity.id}>
-                  <ThemedText type='default'>{activity.title}</ThemedText>
-                  <ThemedText type='default'>{activity.time}</ThemedText>
-                </ThemedTouchableOpacity>
-              ))}
-            </ThemedView>
-          </ScrollView>
-        </View>
 
-        <View style={{ padding: 5, gap: 10, marginLeft: 20, marginRight: 20 }}>
-          <ThemedText type='subtitle'>Quick Tools</ThemedText>
-
-          <BlockedView margin={10} flexDirection='row' gap={10}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexDirection: 'row', gap: 10 }}>
-              {quickTools.map((tool) => (
-                <ThemedTouchableOpacity width={150} key={tool.id}>
-                  <ThemedText type='default'>{tool.title}</ThemedText>
-                </ThemedTouchableOpacity>
-              ))}
-            </ScrollView>
-
-          </BlockedView>
-        </View>
-        
-        <View style={{ padding: 5, gap: 10, marginLeft: 20, marginRight: 20 }}>
-          <ThemedText type='subtitle'>Your Progress</ThemedText>
-
-          {/* Placeholder for progress charts */}
-          <BlockedView height={200} margin={10} flexDirection='column' gap={10} alignCenter='False'>
-          </BlockedView>
-        </View>
       </ScrollView>
 
     </SafeAreaView>
@@ -98,25 +76,41 @@ function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  greetingSection: {
-    paddingLeft: 20,
+  scrollView: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    height:'100%'
   },
-  summaryHeader: {
-    textAlign: 'center',
-  },
-  emotionSelector: {
+  featureGrid: {
     flexDirection: 'row',
-    gap: 20,
-    marginTop: 10,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 8,
   },
-  emotionBlock: {
-    justifyContent: 'center',
-    width: 40,
-    height: 40,
+  featureBlock: {
+    backgroundColor: '#5724ff',
+    width: '48%', // Approx. 2 columns with a small gap
+    height: 120,
+    borderRadius: 16,
+    padding: 16,
     alignItems: 'center',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  blockTitle: {
+    fontWeight: '600',
+    fontSize: 16,
+    textAlign: 'center',
+    color: 'white',
+  },
+  block: {
+    width: '50%',
+    height: 50,
+    backgroundColor: '#5724ffff'
   }
 })
 

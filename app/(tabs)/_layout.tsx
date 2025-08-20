@@ -7,6 +7,10 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -20,17 +24,50 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
+            
             position: 'absolute',
           },
           default: {},
         }),
       }}>
+        
       <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="predictor"
+        options={{
+          title: 'Predictor',
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="robot" size={24} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="community"
+        options={{
+          title: 'Community',
+          tabBarIcon: ({ color }) => <MaterialIcons name="groups" size={24} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="task-list"
+        options={{
+          title: 'Tasks',
+          tabBarIcon: ({ color }) => <FontAwesome5 name="tasks" size={24} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="journal-list"
+        options={{
+          title: 'Journal',
+          tabBarIcon: ({ color }) => <Ionicons name="journal" size={24} color={color} />,
         }}
       />
     </Tabs>

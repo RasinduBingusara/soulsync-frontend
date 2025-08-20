@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react'
 import { ActivityIndicator, Button, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+
 import { collection, getDocs, getFirestore, query, where } from '@react-native-firebase/firestore'
 import { getAuth } from "@react-native-firebase/auth"
 
