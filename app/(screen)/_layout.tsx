@@ -15,7 +15,8 @@ export default function ScreenLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <Stack>
-        <Stack.Screen name="task" options={{ headerShown: true, title: 'Task' }} />
+        <Stack.Screen name="task_create" options={{ headerShown: false }} />
+        <Stack.Screen name="task_view" options={{ headerShown: false }} />
         <Stack.Screen name="journal_create" options={{ headerShown: false }} />
         <Stack.Screen name="journal_edit" options={{ headerShown: false }} />
       </Stack>
