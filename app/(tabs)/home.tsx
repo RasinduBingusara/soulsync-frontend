@@ -8,6 +8,7 @@ import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from "@react-native-firebase/auth"
+import { router } from 'expo-router'
 
 interface IfeatureBlock {
   title: string
@@ -54,6 +55,7 @@ function HomeScreen() {
       <View style={{ gap: 10 }}>
         <Button title='Sign Out' onPress={() => auth().signOut()} color={'#ff0000ff'} />
         <Button title='Clear data' onPress={clearAllData} />
+        <Button title='Chat bot' onPress={() => {router.push('/(screen)/chat_bot')}} />
       </View>
       <ScrollView style={styles.scrollView}>
 
