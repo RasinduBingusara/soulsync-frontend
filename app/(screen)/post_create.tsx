@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import {collection,addDoc,getFirestore} from '@react-native-firebase/firestore'
-import {getAuth} from "@react-native-firebase/auth"
+import { collection, addDoc, getFirestore } from '@react-native-firebase/firestore';
+import { getAuth } from '@react-native-firebase/auth';
 import { router } from 'expo-router';
 
 interface checkBoxInter {
-  isChecked:boolean,
-  onToggle:()=>void,
-  label: string
+  isChecked: boolean;
+  onToggle: () => void;
+  label: string;
 }
-const Checkbox = ({ isChecked, onToggle, label }:checkBoxInter) => {
+
+const Checkbox = ({ isChecked, onToggle, label }: checkBoxInter) => {
   return (
     <TouchableOpacity onPress={onToggle} style={styles.container}>
       <View style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
@@ -21,7 +22,6 @@ const Checkbox = ({ isChecked, onToggle, label }:checkBoxInter) => {
 };
 
 const CreatePost = () => {
-
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isAnonymouse, setIsAnonymouse] = useState(false);
@@ -33,70 +33,71 @@ const CreatePost = () => {
   const createPost = async () => {
     setLoading(true);
     try {
-      const docRef = await addDoc(collection(db,'Posts'),{
-        uid:user?.uid,
-        email: user?.email,
+      if (!user) {
+        throw new Error("User not authenticated.");
+      }
+      
+      const docRef = await addDoc(collection(db, 'Posts'), {
+        uid: user.uid,
+        email: user.email,
         content: content,
         title: title,
         isAnonymouse: isAnonymouse,
-        profileName:user?.displayName
-      })
+        profileName: user.displayName,
+        likesCount: 0, // Initialize likes count
+        commentsCount: 0 // Initialize comments count
+      });
       console.log('Post created with ID: ', docRef.id);
       setTitle('');
       setContent('');
-    }
-    catch (err) {
+    } catch (err) {
       console.log('Error creating post: ', err);
-    }
-    finally {
+      Alert.alert('Error', 'Failed to create post. Please try again.');
+    } finally {
       setLoading(false);
-      router.push('/(tabs)/community'); 
+      router.push('/(tabs)/community');
     }
-  }
+  };
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Create a New Post</Text>
-
       <TextInput
         style={styles.input}
         placeholder="Post Title"
         value={title}
         onChangeText={setTitle}
       />
-
       <TextInput
         style={[styles.input, styles.contentInput]}
         placeholder="What's on your mind?"
         value={content}
         onChangeText={setContent}
         multiline
-        textAlignVertical="top" 
+        textAlignVertical="top"
       />
       <Checkbox
-      isChecked={isAnonymouse}
-      onToggle={() => {setIsAnonymouse(!isAnonymouse)}}
-      label='Anonymouse'
+        isChecked={isAnonymouse}
+        onToggle={() => { setIsAnonymouse(!isAnonymouse) }}
+        label='Anonymouse'
       />
-
       {
         loading ? (
           <ActivityIndicator size={'small'} style={{ margin: 28 }} />
-        ) :
-          (
-            <Button
-              title="Create Post"
-              onPress={createPost}
-              color="#007AFF" // iOS blue, can be customized
-            />
-          )
+        ) : (
+          <Button
+            title="Create Post"
+            onPress={createPost}
+            color="#007AFF"
+          />
+        )
       }
-
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  // ... (Your existing styles)
   container: {
     flex: 1,
     padding: 20,

@@ -1,37 +1,138 @@
-import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { getAuth } from '@react-native-firebase/auth';
+import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, setDoc } from '@react-native-firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Button, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface PostProps {
-  id: string | null,
-  title: string,
-  content: string,
-  uid: string,
-  email: string,
-  isAnonymouse: boolean,
-  profileName: string,
-  profileImage: string
+  id: string;
+  title: string;
+  content: string;
+  uid: string;
+  email: string;
+  isAnonymouse: boolean;
+  profileName: string;
+  profileImage: string;
+  onClose: () => void;
+}
+interface Comment {
+  id: string;
+  userId: string;
+  userName: string;
+  comment: string;
+  timestamp: Date;
 }
 
-const Post = ({ id, title, content, uid, email, isAnonymouse, profileName, profileImage='' }: PostProps) => {
+const Post = ({ id, title, content, uid, email, isAnonymouse, profileName, profileImage = '' }: PostProps) => {
+  const [likesCount, setLikesCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState<Comment[]>([]);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading,setLoading] = useState(false);
+
+  const db = getFirestore();
+  const user = getAuth().currentUser;
+
+  // Listen for real-time updates to likes and comments
+  useEffect(() => {
+    if (!id) return;
+
+    // Likes Listener
+    const likesRef = collection(db, `Posts/${id}/likes`);
+    const likesUnsubscribe = onSnapshot(likesRef, (querySnapshot) => {
+      setLikesCount(querySnapshot.size);
+      const userLiked = querySnapshot.docs.some((doc: any) => doc.id === user?.uid);
+      setIsLiked(userLiked);
+    });
+
+    // Comments Listener
+    const commentsCountRef = collection(db, `Posts/${id}/comments`);
+    const commentsCountUnsubscribe = onSnapshot(commentsCountRef, (querySnapshot) => {
+      setCommentsCount(querySnapshot.size);
+    });
+
+    const commentsRef = collection(db, 'Posts', id, 'comments');
+    const commentsUnsubscribe = onSnapshot(commentsRef, (querySnapshot) => {
+      const fetchedComments = querySnapshot.docs.map((doc:any) => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate(), // Convert Firestore Timestamp to Date object
+      })) as Comment[];
+
+      // Sort comments by timestamp
+      fetchedComments.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      setComments(fetchedComments);
+    }, (error) => {
+      console.error("Error fetching comments: ", error);
+    });
+
+    // Clean up listeners on unmount
+    return () => {
+      likesUnsubscribe();
+      commentsUnsubscribe();
+      commentsCountUnsubscribe();
+    };
+  }, [id, db, user]);
+
+  const handleLike = async () => {
+    if (!user || !id) return;
+    const likeRef = doc(db, `Posts/${id}/likes`, user.uid);
+    
+    try {
+      if (isLiked) {
+        // Unlike the post
+        await deleteDoc(likeRef);
+      } else {
+        // Like the post
+        await setDoc(likeRef, {
+          userId: user.uid,
+          timestamp: new Date(),
+        });
+      }
+    } catch (err) {
+      console.error('Error handling like:', err);
+    }
+  };
+
+  const handleComment = async () => {
+    if (!user || !id || !commentText.trim()) return;
+
+    setLoading(true);
+    try {
+      await addDoc(collection(db, 'Posts', id, 'comments'), {
+        userId: user.uid,
+        userName: user.displayName,
+        comment: commentText.trim(),
+        timestamp: new Date(),
+      });
+      setCommentText(''); // Clear the input field
+      console.log('Comment added successfully!');
+    } catch (err) {
+      console.error('Error adding comment:', err);
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
+  const renderCommentItem = ({ item }:any) => (
+    <View style={styles.commentItem}>
+      <Text style={styles.commentUser}>{item.userName || 'Anonymous'}</Text>
+      <Text style={styles.commentText}>{item.comment}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        {
-          isAnonymouse ? (
-            <View style={styles.profileContainer}>
-              {/* <Image source={{ uri: profileImage }} style={styles.profileImage} /> */}
-              <Text style={styles.profileName}>Anonymouse</Text>
-            </View>
-          ) : (
-            <View style={styles.profileContainer}>
-              {/* <Image source={{ uri: profileImage }} style={styles.profileImage} /> */}
-              <Text style={styles.profileName}>{profileName}</Text>
-            </View>
-          )
-        }
-
+        <View style={styles.profileContainer}>
+          <Text style={styles.profileName}>
+            {isAnonymouse ? 'Anonymouse' : profileName}
+          </Text>
+        </View>
         <TouchableOpacity>
           <Text>Follow</Text>
         </TouchableOpacity>
@@ -42,20 +143,69 @@ const Post = ({ id, title, content, uid, email, isAnonymouse, profileName, profi
 
       {/* Action Buttons */}
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.actionButton}>
-          {/* <Icon name="heart-outline" size={24} color="#555" /> */}
-          <Text style={styles.actionText}>Like</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
+          <Text style={[styles.actionText, isLiked && styles.likedActionText]}>
+            {isLiked ? '♥ Liked' : '♡ Like'} ({likesCount})
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
-          {/* <Icon name="comment-outline" size={24} color="#555" /> */}
-          <Text style={styles.actionText}>Comment</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={() => { setIsModalVisible(true) }}>
+          <Text style={styles.actionText}>
+            Comment ({commentsCount})
+          </Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => {setIsModalVisible(false)}}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.headerTitle}>Comments</Text>
+              <Button title="Close" onPress={() => {setIsModalVisible(false)}} />
+            </View>
+
+            <FlatList
+              data={comments}
+              renderItem={renderCommentItem}
+              keyExtractor={item => item.id}
+              contentContainerStyle={styles.commentsList}
+              inverted
+            />
+
+            <View style={styles.commentInputContainer}>
+              <TextInput
+                style={styles.commentInput}
+                placeholder="Add a comment..."
+                value={commentText}
+                onChangeText={setCommentText}
+                onSubmitEditing={handleComment}
+              />
+              {
+                loading? (
+                  <ActivityIndicator size={'small'}/>
+                ):
+                (
+                  <Button title="Post" onPress={handleComment} disabled={!commentText.trim()} />
+                )
+              }
+              
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  // ... (Your existing styles)
   container: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -77,16 +227,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Makes the image circular
-    marginRight: 10,
-  },
   profileName: {
     fontWeight: 'bold',
     fontSize: 16,
-    color:'black'
+    color: 'black',
   },
   title: {
     fontSize: 14,
@@ -116,6 +260,67 @@ const styles = StyleSheet.create({
   actionText: {
     marginLeft: 5,
     color: '#555',
+  },
+  likedActionText: {
+    color: '#E0115F',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: '70%', // Adjust height as needed
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  commentsList: {
+    flexGrow: 1,
+    padding: 15,
+  },
+  commentItem: {
+    backgroundColor: '#f1f1f1',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  commentUser: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  commentText: {
+    color: '#333',
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    padding: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    backgroundColor: 'white',
+    alignItems: 'center',
+  },
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginRight: 10,
   },
 });
 
