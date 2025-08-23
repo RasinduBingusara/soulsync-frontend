@@ -8,18 +8,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { collection, getDocs, getFirestore, query, where } from '@react-native-firebase/firestore'
 import { getAuth } from "@react-native-firebase/auth"
 import { FontAwesome } from '@expo/vector-icons';
+import { PostProps } from '@/components/CustomProps';
 
-interface PostProps {
-  id: string;
-  title: string;
-  content: string;
-  uid: string;
-  email: string;
-  isAnonymouse: boolean;
-  profileName: string;
-  profileImage: string;
-  onClose: () => void;
-}
 
 function community() {
   const [posts, setPosts] = useState<PostProps[]>([]);
@@ -75,11 +65,7 @@ function community() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Journal Entries</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => { router.push('/(screen)/post_create') }}>
-          <FontAwesome name="plus" size={16} color="white" style={styles.addButtonIcon} />
-          <Text style={styles.addButtonText}>Create Post</Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Community Posts</Text>
       </View>
 
       {posts[0] ? (
@@ -89,13 +75,12 @@ function community() {
             <Post
               key={item.id}
               id={item.id}
-              title={item.title}
               content={item.content}
               uid={item.uid}
               email={item.email}
+              mood={item.mood}
               isAnonymouse={item.isAnonymouse}
               profileName={item.profileName}
-              profileImage=''
               onClose={() => { console.log('close comment') }}
             />
           )}
@@ -113,7 +98,7 @@ function community() {
           <Text style={styles.noEntry}>No journals yet</Text>
         )
       }
-      <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/journal_create') }}>
+      <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/post_create') }}>
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>
     </SafeAreaView>

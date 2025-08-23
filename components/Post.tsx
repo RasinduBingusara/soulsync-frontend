@@ -2,18 +2,9 @@ import { getAuth } from '@react-native-firebase/auth';
 import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, setDoc } from '@react-native-firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Button, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { PostProps } from './CustomProps';
 
-interface PostProps {
-  id: string;
-  title: string;
-  content: string;
-  uid: string;
-  email: string;
-  isAnonymouse: boolean;
-  profileName: string;
-  profileImage: string;
-  onClose: () => void;
-}
 interface Comment {
   id: string;
   userId: string;
@@ -22,7 +13,7 @@ interface Comment {
   timestamp: Date;
 }
 
-const Post = ({ id, title, content, uid, email, isAnonymouse, profileName, profileImage = '' }: PostProps) => {
+const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostProps) => {
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -134,12 +125,12 @@ const Post = ({ id, title, content, uid, email, isAnonymouse, profileName, profi
           </Text>
         </View>
         <TouchableOpacity>
-          <Text>Follow</Text>
+          <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{content}</Text>
+      <Text style={{fontStyle: 'italic', color: '#6b7280', marginBottom: 10}}>Mood: {mood}</Text>
 
       {/* Action Buttons */}
       <View style={styles.actionsContainer}>

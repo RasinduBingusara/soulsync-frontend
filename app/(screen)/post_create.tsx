@@ -3,6 +3,8 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityI
 import { collection, addDoc, getFirestore } from '@react-native-firebase/firestore';
 import { getAuth } from '@react-native-firebase/auth';
 import { router } from 'expo-router';
+import { FontAwesome } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface checkBoxInter {
   isChecked: boolean;
@@ -22,13 +24,40 @@ const Checkbox = ({ isChecked, onToggle, label }: checkBoxInter) => {
 };
 
 const CreatePost = () => {
-  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isAnonymouse, setIsAnonymouse] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isMoodPredicting, setIsMoodPredicting] = useState(false);
 
   const db = getFirestore();
   const user = getAuth().currentUser;
+
+  const predictMood = async (text: string) => {
+
+    setIsMoodPredicting(true);
+    try{
+      const response = await fetch('http://192.168.8.100:8000/emotion', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      setIsMoodPredicting(false);
+      const data = await response.json();
+      console.log('Mood prediction response:', data.response);
+      return data.response; 
+    }
+    catch (error) {
+      console.error('Error predicting mood:', error);
+      Alert.alert('Error', 'Failed to predict mood. Please try again.');
+      return null;
+    }
+  }
 
   const createPost = async () => {
     setLoading(true);
@@ -36,79 +65,105 @@ const CreatePost = () => {
       if (!user) {
         throw new Error("User not authenticated.");
       }
-      
+
+      const mood = await predictMood(content);
+      if (!mood) {
+        setLoading(false);
+        return;
+      }
+
       const docRef = await addDoc(collection(db, 'Posts'), {
         uid: user.uid,
         email: user.email,
         content: content,
-        title: title,
+        mood: mood,
+        createdAt: new Date(),
         isAnonymouse: isAnonymouse,
         profileName: user.displayName,
-        likesCount: 0, // Initialize likes count
-        commentsCount: 0 // Initialize comments count
+        likesCount: 0,
+        commentsCount: 0 
       });
       console.log('Post created with ID: ', docRef.id);
-      setTitle('');
       setContent('');
+      router.push('/(tabs)/community');
     } catch (err) {
       console.log('Error creating post: ', err);
       Alert.alert('Error', 'Failed to create post. Please try again.');
     } finally {
       setLoading(false);
-      router.push('/(tabs)/community');
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>Create a New Post</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Post Title"
-        value={title}
-        onChangeText={setTitle}
-      />
-      <TextInput
-        style={[styles.input, styles.contentInput]}
-        placeholder="What's on your mind?"
-        value={content}
-        onChangeText={setContent}
-        multiline
-        textAlignVertical="top"
-      />
-      <Checkbox
-        isChecked={isAnonymouse}
-        onToggle={() => { setIsAnonymouse(!isAnonymouse) }}
-        label='Anonymouse'
-      />
-      {
-        loading ? (
-          <ActivityIndicator size={'small'} style={{ margin: 28 }} />
-        ) : (
-          <Button
-            title="Create Post"
-            onPress={createPost}
-            color="#007AFF"
-          />
-        )
-      }
-    </ScrollView>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.push('..')}>
+            <FontAwesome name="arrow-left" size={24} color="#6b7280" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Create New Post</Text>
+        </View>
+        <TextInput
+          style={[styles.input, styles.contentInput]}
+          placeholder="What's on your mind?"
+          value={content}
+          onChangeText={setContent}
+          multiline
+          textAlignVertical="top"
+        />
+        <Checkbox
+          isChecked={isAnonymouse}
+          onToggle={() => { setIsAnonymouse(!isAnonymouse) }}
+          label='Anonymouse'
+        />
+        {
+          isMoodPredicting && (
+            <View style={{ marginVertical: 10 }}>
+              <ActivityIndicator size="small" color="#007AFF" />
+              <Text style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>Predicting Mood...</Text>
+            </View>
+          )
+        }
+        {
+          loading ? (
+            <ActivityIndicator size={'small'} style={{ margin: 28 }} />
+          ) : (
+            <Button
+              title="Create Post"
+              onPress={createPost}
+              color="#007AFF"
+            />
+          )
+        }
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  // ... (Your existing styles)
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal:10
+  },
   container: {
     flex: 1,
     padding: 20,
     backgroundColor: '#f8f8f8',
   },
-  header: {
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
+    fontWeight: '700',
+    marginLeft: 16,
+    color: '#374151',
   },
   input: {
     backgroundColor: '#fff',
