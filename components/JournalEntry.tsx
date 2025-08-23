@@ -3,6 +3,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from "expo-router";
+import { IJournalPostData } from "./custom-interface/CustomProps";
 
 interface IDateTime {
     date: string,
@@ -28,7 +29,7 @@ const getDateTime = (timestamp: string): IDateTime => {
 }
 
 
-export const JournalEntry = ({ id, timestamp, mood, content, emotionColor = '#d0d0d0ff', onDelete, moreOption = true }: any) => {
+export const JournalEntry = ({ id, content, createAt, mood,onDelete,moreOption }: IJournalPostData) => {
 
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
@@ -42,18 +43,18 @@ export const JournalEntry = ({ id, timestamp, mood, content, emotionColor = '#d0
     const editEntry = () => {
         router.navigate({
             pathname: '/(screen)/journal_edit',
-            params: { id, timestamp, mood, content }
+            params: { id, createAt, mood, content }
         });
         setIsModalVisible(false);
     }
 
     useEffect(() => {
-        if (timestamp) {
-            const { date, time } = getDateTime(timestamp);
+        if (createAt) {
+            const { date, time } = getDateTime(createAt);
             setDate(date);
             setTime(time);
         }
-    }, [timestamp]);
+    }, [createAt]);
 
     return (
         <View style={styles.entryContainer}>
@@ -64,18 +65,29 @@ export const JournalEntry = ({ id, timestamp, mood, content, emotionColor = '#d0
                 </View>
 
                 <View style={{ alignItems: 'flex-end', gap: 5 }}>
-                    {
-                        moreOption && (
-                            <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-                                <MaterialCommunityIcons name="dots-horizontal" size={25} color="black" />
-                            </TouchableOpacity>
-                        )
-                    }
+                    <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+                        <MaterialCommunityIcons name="dots-horizontal" size={25} color="black" />
+                    </TouchableOpacity>
 
-                    <View style={[styles.emotionTag, { backgroundColor: emotionColor }]}>
-                        <FontAwesome name={mood === 'Happy' ? 'smile-o' : mood === 'Sad' ? 'frown-o' : 'meh-o'} size={12} color="white" />
-                        <Text style={styles.emotionText}>{mood}</Text>
-                    </View>
+                    {(() => {
+                        const emotionMap: Record<string, { icon: string; color: string }> = {
+                            anger: { icon: 'fire', color: '#e53935' },
+                            fear: { icon: 'exclamation-triangle', color: '#8e24aa' },
+                            joy: { icon: 'smile-o', color: '#fbc02d' },
+                            love: { icon: 'heart', color: '#d81b60' },
+                            neutral: { icon: 'meh-o', color: '#90a4ae' },
+                            sadness: { icon: 'frown-o', color: '#3949ab' },
+                        };
+                        const lowerMood = (mood || '').toLowerCase();
+                        const emotion = emotionMap[lowerMood] || emotionMap['neutral'];
+                        return (
+                            <View style={[styles.emotionTag, { backgroundColor: emotion.color }]}>
+                                <FontAwesome name={emotion.icon as any} size={12} color="white" />
+                                <Text style={styles.emotionText}>{mood}</Text>
+                            </View>
+                        );
+                    })()}
+
                 </View>
             </View>
             <Text style={styles.entryText}>{content}</Text>

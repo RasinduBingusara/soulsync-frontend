@@ -7,24 +7,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { JournalEntry } from '@/components/JournalEntry';
 import { getAuth } from "@react-native-firebase/auth";
 import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where } from '@react-native-firebase/firestore';
-
-
-
-//database attribute names here
-interface IJournalData {
-    uid: string,
-    content: string,
-    createAt: string,
-    mood: string
-}
+import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
+import { PredictMood } from '@/components/custom-function/MoodPredictor';
 
 
 export default function JournalCreate() {
 
-    const [lastJournals, setLastJournals] = useState<IJournalData[]>([]);
+    const [lastJournals, setLastJournals] = useState<IJournalDataResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState('');
-    const [mood, setMood] = useState('happy');
+    const [isMoodPredicting, setIsMoodPredicting] = useState(false);
 
     const db = getFirestore();
     const user = getAuth().currentUser;
@@ -32,7 +24,7 @@ export default function JournalCreate() {
     const getLastJournals = async (count: number) => {
 
         setLoading(true);
-        const lastJournals: IJournalData[] = [];
+        const lastJournals: IJournalDataResponse[] = [];
         try {
             const journalsRef = collection(db, "Journals");
             const q = query(
@@ -58,6 +50,7 @@ export default function JournalCreate() {
         }
     }
 
+
     const saveJournal = async () => {
 
         if (!content) {
@@ -66,6 +59,14 @@ export default function JournalCreate() {
         }
         setLoading(true);
         try {
+            setIsMoodPredicting(true);
+            const mood = await PredictMood(content);
+            setIsMoodPredicting(false);
+            if (!mood) {
+                setLoading(false);
+                return;
+            }
+
             const timestamp = new Date().toISOString();
             const docRef = await addDoc(collection(db, 'Journals'), {
                 uid: user?.uid,
@@ -74,16 +75,14 @@ export default function JournalCreate() {
                 mood: mood,
             })
             console.log('Post created with ID: ', docRef.id);
-
+            setContent('');
+            router.push('/(tabs)/journal-list')
         }
         catch (e) {
             console.log('Error saving journal: ', e)
         }
         finally {
-            setContent('');
-            setMood('');
             setLoading(false);
-            router.push('/(tabs)/journal-list')
         }
     }
 
@@ -123,17 +122,15 @@ export default function JournalCreate() {
                             onChangeText={(value) => setContent(value)}
                         />
                     </View>
+                    {
+                        isMoodPredicting && (
+                            <View style={{ marginVertical: 10 }}>
+                                <ActivityIndicator size="small" color="#007AFF" />
+                                <Text style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>Predicting Mood...</Text>
+                            </View>
+                        )
+                    }
 
-                    {/* The Emotion Section */}
-                    <View style={styles.inputGroupContainer}>
-                        <Text style={styles.inputLabel}>Emotion</Text>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="..."
-                            placeholderTextColor="#9ca3af"
-                            editable={false}
-                        />
-                    </View>
                     {
                         loading ? (
                             <ActivityIndicator size={'small'} />
@@ -155,10 +152,12 @@ export default function JournalCreate() {
                         <FlatList
                             data={lastJournals}
                             renderItem={({ item }) => <JournalEntry
-                                timestamp={item.createAt}
+                                id={item.id}
+                                createAt={item.createAt}
                                 content={item.content}
                                 mood={item.mood}
-                                moreOption={false}
+                                moreOption={() => { console.log('more option') }}
+                                onDelete={() => { console.log('delete entry') }}
                             />}
                             contentContainerStyle={styles.entriesList}
                         />
@@ -276,7 +275,7 @@ const styles = StyleSheet.create({
     },
     previousEntriesSection: {
         flex: 1,
-        marginHorizontal:20
+        marginHorizontal: 20
     },
     previousEntriesTitle: {
         fontSize: 18,

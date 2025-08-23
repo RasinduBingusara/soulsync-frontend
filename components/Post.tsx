@@ -3,7 +3,7 @@ import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, setDoc } 
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Button, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { PostProps } from './CustomProps';
+import { PostProps } from './custom-interface/CustomProps';
 
 interface Comment {
   id: string;

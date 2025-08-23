@@ -7,18 +7,11 @@ import { JournalEntry } from '@/components/JournalEntry';
 
 import { getAuth } from "@react-native-firebase/auth";
 import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where, deleteDoc, doc } from '@react-native-firebase/firestore';
-
-interface IJournalData {
-  id: string,
-  uid: string,
-  content: string,
-  createAt: string,
-  mood: string
-}
+import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
 
 
 export default function JournalList() {
-  const [journalEntries, setJournalEntries] = useState<IJournalData[]>([])
+  const [journalEntries, setJournalEntries] = useState<IJournalDataResponse[]>([])
   const [loading, setLoading] = useState(false);
 
   const db = getFirestore();
@@ -27,7 +20,7 @@ export default function JournalList() {
   const getLastJournals = async (count: number) => {
 
     setLoading(true);
-    const lastJournals: IJournalData[] = [];
+    const lastJournals: IJournalDataResponse[] = [];
     try {
       const journalsRef = collection(db, "Journals");
       const q = query(
@@ -92,10 +85,12 @@ export default function JournalList() {
           data={journalEntries}
           renderItem={({ item }) => <JournalEntry
             id={item.id}
-            timestamp={item.createAt}
+            createAt={item.createAt}
             content={item.content}
             mood={item.mood}
             onDelete={() => deleteJournalEntry(item.id)}
+            moreOption={() => console.log('more option')}
+            
           />}
           refreshControl={
             <RefreshControl

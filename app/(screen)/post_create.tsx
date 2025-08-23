@@ -5,6 +5,7 @@ import { getAuth } from '@react-native-firebase/auth';
 import { router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { PredictMood } from '@/components/custom-function/MoodPredictor';
 
 interface checkBoxInter {
   isChecked: boolean;
@@ -32,41 +33,15 @@ const CreatePost = () => {
   const db = getFirestore();
   const user = getAuth().currentUser;
 
-  const predictMood = async (text: string) => {
-
-    setIsMoodPredicting(true);
-    try{
-      const response = await fetch('http://192.168.8.100:8000/emotion', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      setIsMoodPredicting(false);
-      const data = await response.json();
-      console.log('Mood prediction response:', data.response);
-      return data.response; 
-    }
-    catch (error) {
-      console.error('Error predicting mood:', error);
-      Alert.alert('Error', 'Failed to predict mood. Please try again.');
-      return null;
-    }
-  }
-
   const createPost = async () => {
     setLoading(true);
     try {
       if (!user) {
         throw new Error("User not authenticated.");
       }
-
-      const mood = await predictMood(content);
+      setIsMoodPredicting(true);
+      const mood = await PredictMood(content);
+      setIsMoodPredicting(false);
       if (!mood) {
         setLoading(false);
         return;

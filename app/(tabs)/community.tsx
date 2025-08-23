@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { collection, getDocs, getFirestore, query, where } from '@react-native-firebase/firestore'
 import { getAuth } from "@react-native-firebase/auth"
 import { FontAwesome } from '@expo/vector-icons';
-import { PostProps } from '@/components/CustomProps';
+import { PostProps } from '@/components/custom-interface/CustomProps';
 
 
 function community() {

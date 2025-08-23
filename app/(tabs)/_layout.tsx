@@ -40,14 +40,6 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="predictor"
-        options={{
-          title: 'Predictor',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="robot" size={24} color={color} />,
-        }}
-      />
-
-      <Tabs.Screen
         name="community"
         options={{
           title: 'Community',
