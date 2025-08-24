@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { TPriority,ITask,TaskProps } from '@/components/custom-interface/type';
+import { TPriority } from '@/components/custom-interface/type';
+import { TaskProps } from './custom-interface/CustomProps';
 
 
 interface IDateTime {
@@ -77,13 +78,14 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
           <Text style={styles.contentTitle}>
             {task.content}
           </Text>
+          <Text style={{color: '#6b7280', fontSize: 12 }}>
+            AI Suggestion: {task.aiSuggestion}
+          </Text>
         </View>
       </View>
-      {/* Options/Edit Button */}
-      <View style={{ flexDirection: 'row', alignItems: 'center',justifyContent:'center' }}>
-        {/* <TouchableOpacity style={styles.optionsButton} onPress={() => {router.push('/(screen)/task_view')}}>
-          <FontAwesome name="folder" size={25} color="#1028a2ff" />
-        </TouchableOpacity> */}
+
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
         <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={styles.removeButton}>
           <FontAwesome name="trash" size={25} color="#ef4444" />
         </TouchableOpacity>
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal:30
+    paddingHorizontal: 30
   },
   modalView: {
     backgroundColor: "white",

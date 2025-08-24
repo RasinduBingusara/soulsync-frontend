@@ -7,6 +7,7 @@ import DatePicker from 'react-native-date-picker';
 import { getAuth } from "@react-native-firebase/auth";
 import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where, doc } from '@react-native-firebase/firestore';
 import { TPriority } from '@/components/custom-interface/type';
+import { PredictSuggestion } from '@/components/custom-function/SuggestionProvider';
 
 interface ICheckBox {
   text: string,
@@ -25,6 +26,7 @@ export default function TaskCreate() {
   const [subTaskText, setSubTaskText] = useState('');
   const [checklist, setCheklist] = useState<ICheckBox[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isPredicting, setIsPredicting] = useState(false);
 
   const db = getFirestore();
   const user = getAuth().currentUser;
@@ -71,13 +73,19 @@ export default function TaskCreate() {
 
 
     try {
+      setIsPredicting(true);
+      const suggestion = await PredictSuggestion(taskTitle, taskContent);
+      setIsPredicting(false);
+
+      console.log('Suggested task:', suggestion);
       const docRef = await addDoc(collection(db, 'Tasks'), {
         content: taskContent,
         priority: priority,
         subtasks: subtasksMap,
         title: taskTitle,
-        dateTime:dateTime.toISOString(),
-        uid:user?.uid
+        aiSuggestion: suggestion,
+        dateTime: dateTime.toISOString(),
+        uid: user?.uid
       });
       console.log("Document added with ID: ", docRef.id);
     } catch (e) {
@@ -198,9 +206,14 @@ export default function TaskCreate() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.createButton} onPress={() => createTask(checklist)}>
-            <Text style={styles.createButtonText}>Create Task</Text>
-          </TouchableOpacity>
+          {
+            loading || isPredicting ? <Text style={{ textAlign: 'center', marginBottom: 10, color: '#6b7280' }}>Creating Task...</Text> : (
+              <TouchableOpacity style={styles.createButton} onPress={() => createTask(checklist)}>
+                <Text style={styles.createButtonText}>Create Task</Text>
+              </TouchableOpacity>
+            )
+          }
+
         </View>
 
         <DatePicker

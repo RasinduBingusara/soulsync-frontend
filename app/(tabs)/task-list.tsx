@@ -6,7 +6,8 @@ import { router } from 'expo-router';
 import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where, deleteDoc, doc } from '@react-native-firebase/firestore';
 import { getAuth } from '@react-native-firebase/auth';
 import TaskItem from '@/components/Task';
-import { TPriority, ITask } from '@/components/custom-interface/type';
+import { TPriority } from '@/components/custom-interface/type';
+import { ITask } from '@/components/custom-interface/CustomProps';
 
 
 export default function TaskList() {
@@ -83,7 +84,7 @@ export default function TaskList() {
             key={item.id}
             task={item}
             onEdit={() => { console.log('Edit id: ', item.id) }}
-            onRemoveTask={() => { deleteTask(item.id)}}
+            onRemoveTask={() => { deleteTask(item.id) }}
         />
     );
 
@@ -109,10 +110,6 @@ export default function TaskList() {
                 {/* Header Section */}
                 <View style={styles.headerContainer}>
                     <Text style={styles.headerTitle}>My Tasks</Text>
-                    <TouchableOpacity style={styles.addButton} onPress={() => { router.push('/(screen)/task_create') }}>
-                        <FontAwesome name="plus" size={16} color="white" style={styles.addButtonIcon} />
-                        <Text style={styles.addButtonText}>Add Task</Text>
-                    </TouchableOpacity>
                 </View>
 
                 <FlatList
@@ -125,9 +122,14 @@ export default function TaskList() {
                             colors={['#0059ffff']}
                         />
                     }
+                    contentContainerStyle={styles.entriesList}
                 />
 
             </View>
+
+            <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/task_create') }}>
+                <FontAwesome name="plus" size={24} color="white" />
+            </TouchableOpacity>
         </SafeAreaView>
     );
 }
@@ -275,4 +277,24 @@ const styles = StyleSheet.create({
     optionsButton: {
         marginLeft: 16,
     },
+    entriesList: {
+        gap: 16,
+        paddingBottom: 10
+    },
+    fab: {
+        position: 'absolute',
+        bottom: 24,
+        right: 24,
+        backgroundColor: '#4f46e5',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 5,
+    }
 });
