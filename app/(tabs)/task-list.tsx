@@ -46,6 +46,9 @@ export default function TaskList() {
             if (tasksString) {
                 tasks = JSON.parse(tasksString);
             }
+            if (user?.uid) {
+                tasks = tasks.filter(task => task.uid === user.uid);
+            }
             // Sort by dateTime descending
             tasks.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
             // Limit to count
@@ -82,16 +85,16 @@ export default function TaskList() {
     }
 
     const renderTaskItem = ({ item }: { item: ITask }) => (
-    <View style={styles.taskItem}>
-        <TaskItem
-            key={item.id}
-            task={item}
-            onEdit={() => { console.log('Edit id: ', item.id) }}
-            onRemoveTask={() => { deleteTask(item.id) }}
-        />
+        <View style={styles.taskItem}>
+            <TaskItem
+                key={item.id}
+                task={item}
+                onEdit={() => { console.log('Edit id: ', item.id) }}
+                onRemoveTask={() => { deleteTask(item.id) }}
+            />
 
-    </View>
-);
+        </View>
+    );
 
     const onRefresh = useCallback(async () => {
         setLoading(true);

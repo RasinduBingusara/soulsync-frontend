@@ -19,7 +19,6 @@ export default function JournalCreate() {
     const [content, setContent] = useState('');
     const [isMoodPredicting, setIsMoodPredicting] = useState(false);
 
-    const db = getFirestore();
     const user = getAuth().currentUser;
 
     // const getLastJournals = async (count: number) => {
@@ -57,7 +56,10 @@ export default function JournalCreate() {
         const lastJournals: IJournalDataResponse[] = [];
         try {
             const existingJournals = await AsyncStorage.getItem('Journals');
-            const journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
+            let journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
+            if (user?.uid) {
+                journals = journals.filter(journal => journal.uid === user.uid);
+            }
             journals
                 .sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime())
                 .slice(0, count)

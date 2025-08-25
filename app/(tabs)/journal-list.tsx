@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 import { JournalEntry } from '@/components/JournalEntry';
 import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getAuth} from "@react-native-firebase/auth"
 
 
 export default function JournalList() {
@@ -15,18 +16,23 @@ export default function JournalList() {
   const [page, setPage] = useState(0); // Start at page 0
   const pageSize = 10;
 
+  const user = getAuth().currentUser;
+
   const fetchAllJournals = async () => {
     setLoading(true);
     try {
         const existingJournals = await AsyncStorage.getItem('Journals');
-        const journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
+        let journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
 
+        if (user?.uid) {
+        journals = journals.filter(journal => journal.uid === user.uid);
+      }
         // Sort all journals by date
         journals.sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime());
 
         setAllJournals(journals);
         setDisplayedJournals(journals.slice(0, pageSize));
-        setPage(1); // Set initial page to 1
+        setPage(1); 
     } catch (error) {
         console.error("Failed to load journals from AsyncStorage:", error);
     } finally {

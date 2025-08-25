@@ -23,7 +23,8 @@ export interface IJournalDataResponse {
   id: string,
   content: string,
   createAt: string,
-  mood: string
+  mood: string,
+  uid:string
 }
 
 export interface IJournalPostData {
@@ -50,6 +51,7 @@ interface ISubtasksMap {
 
 export interface ITask {
     id: string,
+    uid: string,
     content: string,
     aiSuggestion: string,
     completed: boolean,

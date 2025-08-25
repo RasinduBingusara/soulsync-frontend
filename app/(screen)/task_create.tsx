@@ -79,6 +79,7 @@ export default function TaskCreate() {
       // Create a new task object
       const newTask = {
         id: Math.random().toString(36).substring(2, 15), 
+        uid:user?.uid,
         content: taskContent,
         priority: priority,
         subtasks: subtasksMap,
