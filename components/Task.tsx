@@ -36,6 +36,11 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
     setShowDeleteModal(false);
   };
 
+  const editTask = () => {
+  // Serialize the task object to a JSON string for navigation
+  router.push({ pathname: "/(screen)/task_view", params: { task: JSON.stringify(task) } });
+};
+
 
   return (
     <View style={[styles.taskItem, true && styles.completedTask]}>
@@ -56,14 +61,38 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
           <Text style={styles.contentTitle}>
             {task.content}
           </Text>
-          <Text style={{color: '#6b7280', fontSize: 12 }}>
+          {task.subtasks && Object.keys(task.subtasks).length > 0 && (
+            <View style={styles.subtasksContainer}>
+              <Text style={styles.subtasksTitle}>Subtasks:</Text>
+              {Object.entries(task.subtasks).map(([key, subtask]: [string, any]) => (
+                <View key={key} style={styles.subtaskRow}>
+                  <FontAwesome
+                    name={subtask.completed ? "check-square" : "square-o"}
+                    size={16}
+                    color={subtask.completed ? "#22c55e" : "#6b7280"}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={[
+                    styles.subtaskText,
+                    subtask.completed && styles.completedSubtaskText
+                  ]}>
+                    {subtask.text}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+          <Text style={{ color: '#6b7280', fontSize: 12 }}>
             AI Suggestion: {task.aiSuggestion}
           </Text>
         </View>
       </View>
 
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <TouchableOpacity onPress={editTask} style={styles.removeButton}>
+          <FontAwesome name="edit" size={25} color="#039900ff" />
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={styles.removeButton}>
           <FontAwesome name="trash" size={25} color="#ef4444" />
         </TouchableOpacity>
@@ -103,36 +132,43 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
 const styles = StyleSheet.create({
   taskItem: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#f9fafb',
-    borderRadius: 12,
+    padding: 18,
+    backgroundColor: '#f8fafc',
+    borderRadius: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    shadowOpacity: 0.07,
+    shadowRadius: 4,
+    elevation: 2,
+    marginBottom: 8,
   },
   completedTask: {
     backgroundColor: '#e5e7eb',
-    opacity: 0.6,
+    opacity: 0.7,
   },
   taskItemContent: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flex: 1,
   },
   taskDetails: {
-    marginLeft: 16,
+    marginLeft: 12,
     flexShrink: 1,
+    flex: 1,
   },
   taskTitle: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 2,
   },
   contentTitle: {
-    fontSize: 14,
+    fontSize: 15,
+    color: '#334155',
+    marginTop: 4,
+    marginBottom: 4,
   },
   completedTitle: {
     textDecorationLine: 'line-through',
@@ -141,72 +177,82 @@ const styles = StyleSheet.create({
   taskMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
+    marginBottom: 2,
+    gap: 8,
   },
   dueDateText: {
-    fontSize: 14,
-    color: '#6b7280',
+    fontSize: 13,
+    color: '#64748b',
     marginRight: 8,
   },
   priorityTag: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 9999,
+    marginLeft: 2,
   },
   highPriority: {
-    backgroundColor: '#fecaca',
+    backgroundColor: '#fee2e2',
   },
   mediumPriority: {
-    backgroundColor: '#fde68a',
+    backgroundColor: '#fef9c3',
   },
   lowPriority: {
-    backgroundColor: '#d1fae5',
+    backgroundColor: '#dcfce7',
   },
   priorityText: {
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#b91c1c',
   },
   optionsButton: {
     marginLeft: 16,
   },
   removeButton: {
-    marginLeft: 16,
+    marginLeft: 12,
+    backgroundColor: '#fee2e2',
+    borderRadius: 8,
+    padding: 6,
   },
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     paddingHorizontal: 30
   },
   modalView: {
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding: 30,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    elevation: 6,
   },
   modalText: {
-    marginBottom: 15,
+    marginBottom: 18,
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 17,
+    color: "#334155",
+    fontWeight: "600",
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 20,
+    marginTop: 18,
+    gap: 12,
   },
   modalButton: {
     borderRadius: 10,
-    padding: 10,
+    padding: 12,
     elevation: 2,
     width: '45%',
     alignItems: 'center',
@@ -221,6 +267,35 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+    fontSize: 15,
+  },
+  subtasksContainer: {
+    marginTop: 10,
+    marginLeft: 0,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 4,
+  },
+  subtasksTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#475569',
+    marginBottom: 6,
+  },
+  subtaskRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    paddingLeft: 2,
+  },
+  subtaskText: {
+    fontSize: 13,
+    color: '#334155',
+  },
+  completedSubtaskText: {
+    textDecorationLine: 'line-through',
+    color: '#94a3b8',
   },
 });
 

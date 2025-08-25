@@ -8,6 +8,7 @@ import { getAuth } from '@react-native-firebase/auth';
 import TaskItem from '@/components/Task';
 import { TPriority } from '@/components/custom-interface/type';
 import { ITask } from '@/components/custom-interface/CustomProps';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function TaskList() {
@@ -39,40 +40,41 @@ export default function TaskList() {
 
     const loadTasks = async (count: number) => {
         setLoading(true);
-        const refreshTasks: ITask[] = [];
         try {
-            const journalsRef = collection(db, "Tasks");
-            const q = query(
-                journalsRef,
-                where("uid", "==", user?.uid),
-                orderBy("dateTime", "desc"),
-                limit(count)
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            querySnapshot.forEach((doc: any) => {
-                refreshTasks.push({ id: doc.id, ...doc.data() });
-                console.log('Task id: ', doc.id);
-            });
+            const tasksString = await AsyncStorage.getItem('Tasks');
+            let tasks: ITask[] = [];
+            if (tasksString) {
+                tasks = JSON.parse(tasksString);
+            }
+            // Sort by dateTime descending
+            tasks.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
+            // Limit to count
+            setLatestTasks(tasks.slice(0, count));
         }
         catch (e) {
             console.log('Error loading tasks: ', e)
         }
         finally {
-            setLatestTasks(refreshTasks);
             setLoading(false);
         }
     }
 
     const deleteTask = async (id: string) => {
+        console.log('Delete task id: ', id);
         setLoading(true);
         try {
-            await deleteDoc(doc(db, "Tasks", id));
+            const tasksString = await AsyncStorage.getItem('Tasks');
+            let tasks: ITask[] = [];
+            if (tasksString) {
+                tasks = JSON.parse(tasksString);
+            }
+            // Remove task by id
+            const updatedTasks = tasks.filter(task => task.id !== id);
+            await AsyncStorage.setItem('Tasks', JSON.stringify(updatedTasks));
             loadTasks(10);
         }
         catch (err) {
-            console.log('Error deleting journal entry: ', err);
+            console.log('Error deleting task: ', err);
         }
         finally {
             setLoading(false);
@@ -80,13 +82,16 @@ export default function TaskList() {
     }
 
     const renderTaskItem = ({ item }: { item: ITask }) => (
+    <View style={styles.taskItem}>
         <TaskItem
             key={item.id}
             task={item}
             onEdit={() => { console.log('Edit id: ', item.id) }}
             onRemoveTask={() => { deleteTask(item.id) }}
         />
-    );
+
+    </View>
+);
 
     const onRefresh = useCallback(async () => {
         setLoading(true);

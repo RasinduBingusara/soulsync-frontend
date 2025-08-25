@@ -8,6 +8,7 @@ import { getAuth } from "@react-native-firebase/auth";
 import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where, doc } from '@react-native-firebase/firestore';
 import { TPriority } from '@/components/custom-interface/type';
 import { PredictSuggestion } from '@/components/custom-function/SuggestionProvider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ICheckBox {
   text: string,
@@ -53,7 +54,6 @@ export default function TaskCreate() {
 
 
   const createTask = async (checklist: ICheckBox[]) => {
-
     if (!taskTitle) {
       Alert.alert('No Title');
       return;
@@ -63,33 +63,44 @@ export default function TaskCreate() {
 
     const subtasksMap: { [key: string]: ICheckBox } = {};
     checklist.forEach((item) => {
-      const newSubtaskKey = doc(collection(db, 'temp')).id;
-
+      // Generate a random key for each subtask
+      const newSubtaskKey = Math.random().toString(36).substring(2, 15);
       subtasksMap[newSubtaskKey] = {
         completed: item.completed,
         text: item.text,
       };
     });
 
-
     try {
       setIsPredicting(true);
       const suggestion = await PredictSuggestion(taskTitle, taskContent);
       setIsPredicting(false);
 
-      console.log('Suggested task:', suggestion);
-      const docRef = await addDoc(collection(db, 'Tasks'), {
+      // Create a new task object
+      const newTask = {
+        id: Math.random().toString(36).substring(2, 15), 
         content: taskContent,
         priority: priority,
         subtasks: subtasksMap,
         title: taskTitle,
         aiSuggestion: suggestion,
         dateTime: dateTime.toISOString(),
-        uid: user?.uid
-      });
-      console.log("Document added with ID: ", docRef.id);
+        // uid: user?.uid // Remove user id
+      };
+
+      // Get existing tasks from AsyncStorage
+      const existingTasks = await AsyncStorage.getItem('Tasks');
+      let tasksArray = [];
+      if (existingTasks) {
+        tasksArray = JSON.parse(existingTasks);
+      }
+      // Add new task
+      tasksArray.push(newTask);
+      await AsyncStorage.setItem('Tasks', JSON.stringify(tasksArray));
+
+      console.log("Task saved locally:", newTask);
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("Error saving task: ", e);
     }
     finally {
       setTaskTitle('');
