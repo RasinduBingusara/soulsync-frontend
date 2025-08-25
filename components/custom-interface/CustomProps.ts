@@ -27,12 +27,11 @@ export interface IJournalDataResponse {
 }
 
 export interface IJournalPostData {
-  id: string,
+  id?: string,
   content: string,
   createAt: string,
   mood: string
-  onDelete: () => void,
-  moreOption: () => void
+  onDelete: (id:string) => void
 }
 
 // Task

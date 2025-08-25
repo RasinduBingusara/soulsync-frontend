@@ -7,6 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { JournalEntry } from '@/components/JournalEntry';
 import { getAuth } from "@react-native-firebase/auth";
 import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where,doc, updateDoc } from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PredictMood } from '@/components/custom-function/MoodPredictor';
 
 
 
@@ -31,33 +33,35 @@ export default function JournalEdit() {
     const db = getFirestore();
     const user = getAuth().currentUser;
 
-    const getLastJournals = async (count: number) => {
-        setLoading(true);
-        const lastJournals: IJournalData[] = [];
-        try {
-            const journalsRef = collection(db, "Journals");
-            const q = query(
-                journalsRef,
-                where("uid", "==", user?.uid),
-                orderBy("createAt", "desc"),
-                limit(count)
-            );
+    // const updateJournal = async () => {
 
-            const querySnapshot = await getDocs(q);
+    //     if (!content) {
+    //         Alert.alert('No content to update');
+    //         return;
+    //     }
+    //     setLoading(true);
+    //     try {
+    //         const timestamp = new Date().toISOString();
+    //         const docRef = await doc(db, 'Journals',id.toString());
+            
+    //         await updateDoc(docRef, {
+    //             mood:updatedmood,
+    //             content:updatedContent,
+    //             createAt:timestamp
+    //         })
+    //         console.log('Post created with ID: ', docRef.id);
 
-            querySnapshot.forEach((doc: any) => {
-                lastJournals.push(doc.data());
-            });
-
-        }
-        catch (error) {
-            console.error("Failed to load tasks:", error);
-        }
-        finally {
-            setLastJournals(lastJournals);
-            setLoading(false);
-        }
-    }
+    //     }
+    //     catch (e) {
+    //         console.log('Error saving journal: ', e)
+    //     }
+    //     finally {
+    //         setUpdatedContent('');
+    //         setUpdatedMood('');
+    //         setLoading(false);
+    //         router.push('/(tabs)/journal-list')
+    //     }
+    // }
 
     const updateJournal = async () => {
 
@@ -67,14 +71,24 @@ export default function JournalEdit() {
         }
         setLoading(true);
         try {
+            const mood = await PredictMood(updatedContent);
+
             const timestamp = new Date().toISOString();
-            const docRef = await doc(db, 'Journals',id.toString());
-            
-            await updateDoc(docRef, {
-                mood:updatedmood,
-                content:updatedContent,
-                createAt:timestamp
-            })
+            const journalKey = id.toString();
+            const existingJournals = await AsyncStorage.getItem('Journals');
+            let journals = existingJournals ? JSON.parse(existingJournals) : [];
+            journals = journals.map((journal: any) =>
+                journal.id === id
+                    ? {
+                        ...journal,
+                        content: updatedContent,
+                        mood: mood,
+                        createAt: timestamp,
+                    }
+                    : journal
+            );
+            await AsyncStorage.setItem('Journals', JSON.stringify(journals));
+            const docRef = { id: id.toString() };
             console.log('Post created with ID: ', docRef.id);
 
         }
@@ -94,9 +108,6 @@ export default function JournalEdit() {
         setUpdatedMood(mood.toString());
     }, [id,timestamp, mood, content])
 
-    useEffect(() => {
-        getLastJournals(5);
-    }, [])
 
 
     return (
@@ -153,30 +164,6 @@ export default function JournalEdit() {
 
                 </View>
             </View>
-
-            <View style={styles.previousEntriesSection}>
-                <Text style={styles.previousEntriesTitle}>Previous Entries</Text>
-                <View style={styles.entriesList}>
-                    {lastJournals[0] ? (
-                        <FlatList
-                            data={lastJournals}
-                            renderItem={({ item }) => <JournalEntry
-                                timestamp={item.createAt}
-                                content={item.content}
-                                mood={item.mood}
-                                moreOption={false}
-                            />}
-                            contentContainerStyle={styles.entriesList}
-                        />
-                    ) :
-                        (
-                            <Text style={styles.noEntry}>No journals yet</Text>
-                        )
-                    }
-
-                </View>
-            </View>
-
 
 
         </SafeAreaView>

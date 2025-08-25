@@ -4,185 +4,218 @@ import { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from "expo-router";
 import { IJournalPostData } from "./custom-interface/CustomProps";
-
-interface IDateTime {
-    date: string,
-    time: string
-}
-
-const getDateTime = (timestamp: string): IDateTime => {
-
-    const dateObject = new Date(timestamp);
-
-    const datePart = dateObject.toISOString().split('T')[0];
-    const localTime = dateObject.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-    });
-
-    return {
-        date: datePart,
-        time: localTime
-    }
-}
+import { getDate, getTime } from '@/components/custom-function/DateTime';
 
 
-export const JournalEntry = ({ id, content, createAt, mood,onDelete,moreOption }: IJournalPostData) => {
+
+export const JournalEntry = ({ id, content, createAt, mood, onDelete }: IJournalPostData) => {
 
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-    const deleteEntry = () => {
-        onDelete();
-        setIsModalVisible(false);
-    }
+    const confirmDelete = () => {
+        if (id !== undefined) {
+            onDelete(id);
+        }
+        setShowDeleteModal(false);
+    };
 
     const editEntry = () => {
         router.navigate({
             pathname: '/(screen)/journal_edit',
             params: { id, createAt, mood, content }
         });
-        setIsModalVisible(false);
+        setShowDeleteModal(false);
     }
 
     useEffect(() => {
         if (createAt) {
-            const { date, time } = getDateTime(createAt);
-            setDate(date);
-            setTime(time);
+            setDate(getDate(createAt));
+            setTime(getTime(createAt));
         }
     }, [createAt]);
 
     return (
-        <View style={styles.entryContainer}>
-            <View style={styles.entryHeader}>
-                <View>
-                    <Text style={styles.entryDate}>{date}</Text>
-                    <Text style={styles.entryDate}>{time}</Text>
-                </View>
+        <View style={[styles.journalItem, true && styles.completedJournal]}>
+            <View style={styles.journalItemContent}>
 
-                <View style={{ alignItems: 'flex-end', gap: 5 }}>
-                    <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-                        <MaterialCommunityIcons name="dots-horizontal" size={25} color="black" />
-                    </TouchableOpacity>
+                <View style={styles.journalDetails}>
 
-                    {(() => {
-                        const emotionMap: Record<string, { icon: string; color: string }> = {
-                            anger: { icon: 'fire', color: '#e53935' },
-                            fear: { icon: 'exclamation-triangle', color: '#8e24aa' },
-                            joy: { icon: 'smile-o', color: '#fbc02d' },
-                            love: { icon: 'heart', color: '#d81b60' },
-                            neutral: { icon: 'meh-o', color: '#90a4ae' },
-                            sadness: { icon: 'frown-o', color: '#3949ab' },
-                        };
-                        const lowerMood = (mood || '').toLowerCase();
-                        const emotion = emotionMap[lowerMood] || emotionMap['neutral'];
-                        return (
-                            <View style={[styles.emotionTag, { backgroundColor: emotion.color }]}>
-                                <FontAwesome name={emotion.icon as any} size={12} color="white" />
-                                <Text style={styles.emotionText}>{mood}</Text>
-                            </View>
-                        );
-                    })()}
-
+                    <View style={styles.journalMeta}>
+                        <Text style={styles.dueDateText}>{getDate(createAt)} / {getTime(createAt)}</Text>
+                    </View>
+                    <Text style={styles.contentTitle}>
+                        {content}
+                    </Text>
+                    <Text style={{ color: '#6b7280', fontSize: 12 }}>
+                        Mood: {mood}
+                    </Text>
                 </View>
             </View>
-            <Text style={styles.entryText}>{content}</Text>
+
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={editEntry} style={styles.removeButton}>
+                    <FontAwesome name="edit" size={25} color="#179b05ff" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={styles.removeButton}>
+                    <FontAwesome name="trash" size={25} color="#ef4444" />
+                </TouchableOpacity>
+            </View>
 
             <Modal
-                visible={isModalVisible}
                 animationType="fade"
                 transparent={true}
-                onRequestClose={() => setIsModalVisible(false)}
+                visible={showDeleteModal}
+                onRequestClose={() => setShowDeleteModal(false)}
             >
-                <TouchableOpacity
-                    style={styles.modalContainer}
-                    activeOpacity={1}
-                    onPressOut={() => setIsModalVisible(false)}
-                >
-                    <View style={styles.modalContent}>
-                        <TouchableOpacity style={styles.option} onPress={() => editEntry()}>
-                            <MaterialCommunityIcons name="application-edit" size={24} color="green" />
-                            <Text style={[styles.optionText, { color: 'green' }]}>Edit</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.option} onPress={() => { deleteEntry() }}>
-                            <MaterialCommunityIcons name="delete" size={24} color="red" />
-                            <Text style={[styles.optionText, { color: 'red' }]}>Delete</Text>
-                        </TouchableOpacity>
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Are you sure you want to delete this task?</Text>
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.buttonCancel]}
+                                onPress={() => setShowDeleteModal(false)}
+                            >
+                                <Text style={styles.buttonText}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.buttonDelete]}
+                                onPress={confirmDelete}
+                            >
+                                <Text style={styles.buttonText}>Delete</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </TouchableOpacity>
+                </View>
             </Modal>
+
         </View>
     )
 };
 
 const styles = StyleSheet.create({
-
-    entryContainer: {
-        backgroundColor: 'white',
+    journalItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 16,
+        backgroundColor: '#f9fafb',
         borderRadius: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-        padding: 16,
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 1,
     },
-    entryHeader: {
+    completedJournal: {
+        backgroundColor: '#e5e7eb',
+        opacity: 0.6,
+    },
+    journalItemContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    journalDetails: {
+        marginLeft: 16,
+        flexShrink: 1,
+    },
+    journalTitle: {
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    contentTitle: {
+        fontSize: 14,
+    },
+    completedTitle: {
+        textDecorationLine: 'line-through',
+        color: '#9ca3af',
+    },
+    journalMeta: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    dueDateText: {
+        fontSize: 10,
+        color: '#6b7280',
+        marginRight: 8,
+    },
+    priorityTag: {
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 9999,
+    },
+    highPriority: {
+        backgroundColor: '#fecaca',
+    },
+    mediumPriority: {
+        backgroundColor: '#fde68a',
+    },
+    lowPriority: {
+        backgroundColor: '#d1fae5',
+    },
+    priorityText: {
+        fontSize: 10,
+        fontWeight: '600',
+    },
+    optionsButton: {
+        marginLeft: 16,
+    },
+    removeButton: {
+        marginLeft: 16,
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        paddingHorizontal: 30
+    },
+    modalView: {
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+        fontSize: 16,
+    },
+    modalButtons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 20,
+    },
+    modalButton: {
+        borderRadius: 10,
+        padding: 10,
+        elevation: 2,
+        width: '45%',
         alignItems: 'center',
-        marginBottom: 8,
     },
-    entryDate: {
-        fontSize: 12,
-        fontWeight: '500',
-        color: '#6b7280',
+    buttonDelete: {
+        backgroundColor: "#ef4444",
     },
-    emotionTag: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 999,
-        gap: 4,
+    buttonCancel: {
+        backgroundColor: "#d1d5db",
     },
-    emotionText: {
-        fontSize: 12,
-        fontWeight: '600',
-        color: 'white',
-    },
-    entryText: {
-        fontSize: 14,
-        color: '#374151',
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'flex-end', // Aligns content to the bottom
-        backgroundColor: 'rgba(0, 0, 0, 0)',
-        marginBottom: 50
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        width: '100%', // Makes it span the full width
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        paddingBottom: 50
-    },
-    option: {
-        flexDirection: 'row',
-        paddingVertical: 10,
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        borderBottomColor: '#ccc',
-        gap: 10
-    },
-    optionText: {
-        fontSize: 16,
-        color: '#333',
+    buttonText: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center",
     },
 });
+

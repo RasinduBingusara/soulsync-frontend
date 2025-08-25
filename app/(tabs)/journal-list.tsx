@@ -4,52 +4,65 @@ import { FontAwesome } from '@expo/vector-icons'; // Used for icons
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { JournalEntry } from '@/components/JournalEntry';
-
-import { getAuth } from "@react-native-firebase/auth";
-import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where, deleteDoc, doc } from '@react-native-firebase/firestore';
 import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function JournalList() {
-  const [journalEntries, setJournalEntries] = useState<IJournalDataResponse[]>([])
+  const [allJournals, setAllJournals] = useState<IJournalDataResponse[]>([]);
+  const [displayedJournals, setDisplayedJournals] = useState<IJournalDataResponse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0); // Start at page 0
+  const pageSize = 10;
 
-  const db = getFirestore();
-  const user = getAuth().currentUser;
+  const fetchAllJournals = async () => {
+    setLoading(true);
+    try {
+        const existingJournals = await AsyncStorage.getItem('Journals');
+        const journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
 
-  const getLastJournals = async (count: number) => {
+        // Sort all journals by date
+        journals.sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime());
+
+        setAllJournals(journals);
+        setDisplayedJournals(journals.slice(0, pageSize));
+        setPage(1); // Set initial page to 1
+    } catch (error) {
+        console.error("Failed to load journals from AsyncStorage:", error);
+    } finally {
+        setLoading(false);
+    }
+};
+
+useEffect(() => {
+    fetchAllJournals();
+}, []);
+
+const loadMoreJournals = () => {
+    if (loading) {
+        return;
+    }
+
+    const newPage = page + 1;
+    const startIndex = page * pageSize;
+    const endIndex = startIndex + pageSize;
+
+    // Check if there are more journals to load
+    if (startIndex >= allJournals.length) {
+        return; // No more journals
+    }
 
     setLoading(true);
-    const lastJournals: IJournalDataResponse[] = [];
-    try {
-      const journalsRef = collection(db, "Journals");
-      const q = query(
-        journalsRef,
-        where("uid", "==", user?.uid),
-        orderBy("createAt", "desc"),
-        limit(count)
-      );
-
-      const querySnapshot = await getDocs(q);
-
-      querySnapshot.forEach((doc: any) => {
-        lastJournals.push({ id: doc.id, ...doc.data() });
-      });
-
-    }
-    catch (error) {
-      console.error("Failed to load tasks:", error);
-    }
-    finally {
-      setJournalEntries(lastJournals);
-      setLoading(false);
-    }
-  }
+    const nextBatch = allJournals.slice(startIndex, endIndex);
+    setDisplayedJournals(prevJournals => [...prevJournals, ...nextBatch]);
+    setPage(newPage);
+    setLoading(false);
+};
 
   const onRefresh = useCallback(async () => {
     setLoading(true);
     try {
-      getLastJournals(10);
+      fetchAllJournals();
     } catch (error) {
       console.error("Failed to fetch new entries:", error);
     } finally {
@@ -60,8 +73,11 @@ export default function JournalList() {
   const deleteJournalEntry = async (id: string) => {
     setLoading(true);
     try {
-      await deleteDoc(doc(db, "Journals", id));
-      getLastJournals(10);
+      const existingJournals = await AsyncStorage.getItem('Journals');
+      let journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
+      journals = journals.filter(journal => journal.id !== id);
+      await AsyncStorage.setItem('Journals', JSON.stringify(journals));
+      fetchAllJournals();
     }
     catch (err) {
       console.log('Error deleting journal entry: ', err);
@@ -71,27 +87,24 @@ export default function JournalList() {
     }
   }
 
-  useEffect(() => {
-    getLastJournals(10);
-  }, [])
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>Journal Entries</Text>
       </View>
-      {journalEntries[0] ? (
+      {displayedJournals.length > 0 ? (
         <FlatList
-          data={journalEntries}
+          data={displayedJournals}
           renderItem={({ item }) => <JournalEntry
             id={item.id}
             createAt={item.createAt}
             content={item.content}
             mood={item.mood}
             onDelete={() => deleteJournalEntry(item.id)}
-            moreOption={() => console.log('more option')}
-            
+
           />}
+          keyExtractor={(item) => item.id}
           refreshControl={
             <RefreshControl
               refreshing={loading}
@@ -99,6 +112,8 @@ export default function JournalList() {
               colors={['#0059ffff']}
             />
           }
+          onEndReached={loadMoreJournals}
+          onEndReachedThreshold={0.5} 
           contentContainerStyle={styles.entriesList}
         />
       ) :
@@ -117,7 +132,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f3f4f6',
-    paddingHorizontal:10
+    paddingHorizontal: 10
   },
   scrollView: {
     paddingHorizontal: 16,

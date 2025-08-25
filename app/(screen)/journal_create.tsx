@@ -9,6 +9,7 @@ import { getAuth } from "@react-native-firebase/auth";
 import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where } from '@react-native-firebase/firestore';
 import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
 import { PredictMood } from '@/components/custom-function/MoodPredictor';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function JournalCreate() {
@@ -21,24 +22,46 @@ export default function JournalCreate() {
     const db = getFirestore();
     const user = getAuth().currentUser;
 
+    // const getLastJournals = async (count: number) => {
+
+    //     setLoading(true);
+    //     const lastJournals: IJournalDataResponse[] = [];
+    //     try {
+    //         const journalsRef = collection(db, "Journals");
+    //         const q = query(
+    //             journalsRef,
+    //             where("uid", "==", user?.uid),
+    //             orderBy("createAt", "desc"),
+    //             limit(count)
+    //         );
+
+    //         const querySnapshot = await getDocs(q);
+
+    //         querySnapshot.forEach((doc: any) => {
+    //             lastJournals.push(doc.data());
+    //         });
+
+    //     }
+    //     catch (error) {
+    //         console.error("Failed to load tasks:", error);
+    //     }
+    //     finally {
+    //         setLastJournals(lastJournals);
+    //         setLoading(false);
+    //     }
+    // }
+
     const getLastJournals = async (count: number) => {
 
         setLoading(true);
         const lastJournals: IJournalDataResponse[] = [];
         try {
-            const journalsRef = collection(db, "Journals");
-            const q = query(
-                journalsRef,
-                where("uid", "==", user?.uid),
-                orderBy("createAt", "desc"),
-                limit(count)
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            querySnapshot.forEach((doc: any) => {
-                lastJournals.push(doc.data());
-            });
+            const existingJournals = await AsyncStorage.getItem('Journals');
+            const journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
+            journals
+                .sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime())
+                .slice(0, count)
+                .forEach(journal => lastJournals.push(journal));
 
         }
         catch (error) {
@@ -51,6 +74,41 @@ export default function JournalCreate() {
     }
 
 
+    // const saveJournal = async () => {
+
+    //     if (!content) {
+    //         Alert.alert('No content to save');
+    //         return;
+    //     }
+    //     setLoading(true);
+    //     try {
+    //         setIsMoodPredicting(true);
+    //         const mood = await PredictMood(content);
+    //         setIsMoodPredicting(false);
+    //         if (!mood) {
+    //             setLoading(false);
+    //             return;
+    //         }
+
+    //         const timestamp = new Date().toISOString();
+    //         const docRef = await addDoc(collection(db, 'Journals'), {
+    //             uid: user?.uid,
+    //             createAt: timestamp,
+    //             content: content,
+    //             mood: mood,
+    //         })
+    //         console.log('Post created with ID: ', docRef.id);
+    //         setContent('');
+    //         router.push('/(tabs)/journal-list')
+    //     }
+    //     catch (e) {
+    //         console.log('Error saving journal: ', e)
+    //     }
+    //     finally {
+    //         setLoading(false);
+    //     }
+    // }
+
     const saveJournal = async () => {
 
         if (!content) {
@@ -61,6 +119,7 @@ export default function JournalCreate() {
         try {
             setIsMoodPredicting(true);
             const mood = await PredictMood(content);
+            console.log('Predicted Mood: ', mood);
             setIsMoodPredicting(false);
             if (!mood) {
                 setLoading(false);
@@ -68,12 +127,20 @@ export default function JournalCreate() {
             }
 
             const timestamp = new Date().toISOString();
-            const docRef = await addDoc(collection(db, 'Journals'), {
+            const newJournal = {
+                id: Date.now().toString(),
                 uid: user?.uid,
                 createAt: timestamp,
                 content: content,
                 mood: mood,
-            })
+            };
+
+            const existingJournals = await AsyncStorage.getItem('Journals');
+            const journals = existingJournals ? JSON.parse(existingJournals) : [];
+            journals.unshift(newJournal);
+            await AsyncStorage.setItem('Journals', JSON.stringify(journals));
+            const docRef = { id: newJournal.id };
+
             console.log('Post created with ID: ', docRef.id);
             setContent('');
             router.push('/(tabs)/journal-list')
@@ -85,7 +152,6 @@ export default function JournalCreate() {
             setLoading(false);
         }
     }
-
 
 
     useEffect(() => {
@@ -156,7 +222,6 @@ export default function JournalCreate() {
                                 createAt={item.createAt}
                                 content={item.content}
                                 mood={item.mood}
-                                moreOption={() => { console.log('more option') }}
                                 onDelete={() => { console.log('delete entry') }}
                             />}
                             contentContainerStyle={styles.entriesList}
