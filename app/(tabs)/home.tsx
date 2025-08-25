@@ -3,12 +3,16 @@ import { Separator } from '@/components/Seperator'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedTouchableOpacity } from '@/components/ThemedTouchableOpacity'
 import { ThemedView } from '@/components/ThemedView'
-import { useState } from 'react'
-import { Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { useEffect, useState } from 'react'
+import { Button, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from "@react-native-firebase/auth"
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { router } from 'expo-router'
+import { CustomTextInput } from '@/components/custom-components/CustomText'
+import { CustomButton } from '@/components/custom-components/CustomButton'
+import { PredictMood } from '@/components/custom-function/MoodPredictor'
 
 interface IfeatureBlock {
   title: string
@@ -24,6 +28,8 @@ function HomeScreen() {
 
   const [userName, setUserName] = useState('Beebyte')
   const [emotionSummary, setEmotionSummary] = useState('How you feeling today! 😊')
+  const [isPopUpVisible, setIsPopUpVisible] = useState(false)
+  const [aboutToday, setAboutToday] = useState('')
   const todayActivities = [
     { id: 1, title: 'Morning Meditation', time: '08:00 AM' },
     { id: 2, title: 'Yoga Session', time: '09:00 AM' },
@@ -50,28 +56,106 @@ function HomeScreen() {
       console.error('Failed to clear Async Storage:', e);
     }
   };
+
+  const handleSignOut = async () => {
+    try {
+
+      await GoogleSignin.signOut();
+
+      await auth().signOut();
+
+      console.log('User signed out successfully from both Firebase and Google.');
+
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
+  };
+
+  const getTodayMood = async () => {
+    try {
+      const mood = await PredictMood(aboutToday);
+      if (mood) {
+        setEmotionSummary(`You seem to be feeling ${mood} today!`);
+        console.log(`Predicted mood: ${mood}`);
+      } else {
+        setEmotionSummary("Couldn't predict your mood. Please try again.");
+      }
+    } catch (error) {
+      console.error('Error predicting mood:', error);
+      setEmotionSummary("Error predicting mood. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    setIsPopUpVisible(true);
+  }, [])
+
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
       <View style={{ gap: 10 }}>
-        <Button title='Sign Out' onPress={() => auth().signOut()} color={'#ff0000ff'} />
+        <Button title='Sign Out' onPress={() => handleSignOut()} color={'#ff0000ff'} />
         <Button title='Clear data' onPress={clearAllData} />
-        <Button title='Chat bot' onPress={() => {router.push('/(screen)/chat_bot')}} />
+        <Button title='Chat bot' onPress={() => { router.push('/(screen)/chat_bot') }} />
+        <Button title='Dashboard' onPress={() => { router.push('/(screen)/dashboard') }} />
       </View>
       <ScrollView style={styles.scrollView}>
 
         <View style={styles.featureGrid}>
           <FeatureBlock title="Emotion Recognition ✅" />
           <FeatureBlock title="Recommendations" />
-          <FeatureBlock title="Daily Tracker" />
-          <FeatureBlock title="Journal Keeper" />
-          <FeatureBlock title="Multilingual Chatbot" />
-          <FeatureBlock title="Analysis Dashboard" />
+          <FeatureBlock title="Daily Tracker ✅" />
+          <FeatureBlock title="Journal Keeper ✅" />
+          <FeatureBlock title="Multilingual Chatbot ✅" />
+          <FeatureBlock title="Analysis Dashboard ✅" />
           <FeatureBlock title="Learning Zone" />
-          <FeatureBlock title="Supportive Community" />
+          <FeatureBlock title="Supportive Community ✅" />
         </View>
 
 
       </ScrollView>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isPopUpVisible}
+        onRequestClose={() => setIsPopUpVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setIsPopUpVisible(false)}
+        >
+          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsPopUpVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.modalHeader}>How about your day?</Text>
+            <ScrollView style={styles.messageScrollView}>
+              <CustomTextInput
+                type='area'
+                label="Tell us about your day"
+                placeholder="Enter your message here..."
+                value={aboutToday}
+                setValue={(value) => setAboutToday(value)}
+              />
+              <CustomButton
+                text='Submit'
+                pressable={aboutToday.length>0?true:false}
+                fontSize={16}
+                onPress={() => {
+                  console.log(aboutToday)
+                  setEmotionSummary(aboutToday)
+                  setIsPopUpVisible(false)
+                }}
+              />
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
     </SafeAreaView>
   )
@@ -81,7 +165,7 @@ const styles = StyleSheet.create({
   scrollView: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    height:'100%'
+    height: '100%'
   },
   featureGrid: {
     flexDirection: 'row',
@@ -113,7 +197,52 @@ const styles = StyleSheet.create({
     width: '50%',
     height: 50,
     backgroundColor: '#5724ffff'
-  }
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    padding: 24,
+    width: '90%',
+    maxWidth: 480,
+    maxHeight: '80%',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    padding: 8,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: '#9ca3af',
+  },
+  modalHeader: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  messageScrollView: {
+    maxHeight: 400,
+    paddingVertical: 10,
+  },
+  messageText: {
+    fontSize: 16,
+    color: '#374151',
+    lineHeight: 24,
+  },
 })
 
 export default HomeScreen

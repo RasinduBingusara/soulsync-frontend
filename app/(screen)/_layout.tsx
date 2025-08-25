@@ -20,6 +20,7 @@ export default function ScreenLayout() {
         <Stack.Screen name="journal_create" options={{ headerShown: false }} />
         <Stack.Screen name="journal_edit" options={{ headerShown: false }} />
         <Stack.Screen name="post_create" options={{ headerShown: false }} />
+        <Stack.Screen name="dashboard" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
