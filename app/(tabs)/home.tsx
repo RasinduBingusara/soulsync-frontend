@@ -53,7 +53,7 @@ const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress }
 function HomeScreen() {
 
   const [userName, setUserName] = useState('Beebyte')
-  const [emotionSummary, setEmotionSummary] = useState('How you feeling today! 😊')
+  const [emotionSummary, setEmotionSummary] = useState('How are you feeling right now?')
   const [isPopUpVisible, setIsPopUpVisible] = useState(false);
   const [aboutToday, setAboutToday] = useState('')
   const [loading, setLoading] = useState(false);
@@ -77,8 +77,25 @@ function HomeScreen() {
       if (mood) {
         setEmotionSummary(`You seem to be feeling ${mood} today!`);
         console.log(`Predicted mood: ${mood}`);
-        auth.currentUser?.uid && (
-          await saveDailyMood(auth.currentUser?.uid, mood, aboutToday))
+        const today = new Date().toISOString().slice(0, 10);
+        const uid = auth.currentUser?.uid || '';
+        const newEntry = { uid, mood, aboutToday, date: today };
+
+        try {
+          const stored = await AsyncStorage.getItem('DailyMoods');
+          let moods = stored ? JSON.parse(stored) : [];
+          const index = moods.findIndex((item: any) => item.date === today && item.uid === uid);
+
+          if (index !== -1) {
+            moods[index] = newEntry;
+          } else {
+            moods.push(newEntry);
+          }
+
+          await AsyncStorage.setItem('DailyMoods', JSON.stringify(moods));
+        } catch (e) {
+          console.error('Failed to save daily mood:', e);
+        }
       } else {
         setEmotionSummary("Couldn't predict your mood. Please try again.");
         console.log('No mood predicted.');
@@ -126,7 +143,7 @@ function HomeScreen() {
           {/* Daily Check-in */}
           <InteractiveBlock
             title="Check-in Today"
-            subtitle="How are you feeling right now?"
+            subtitle={emotionSummary}
             iconName="edit"
             isMain={true}
             onPress={() => setIsPopUpVisible(true)}

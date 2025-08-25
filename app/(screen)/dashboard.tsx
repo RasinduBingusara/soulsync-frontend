@@ -1,23 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PieChart from 'react-native-pie-chart';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth } from '@react-native-firebase/auth';
 
 const { width } = Dimensions.get('window');
 
-
 const emotionLabels = ['Anger', 'Fear', 'Joy', 'Love', 'Neutral', 'Sadness'];
-
-const serise = [
-    { value: 10, color: '#ef4444' },
-    { value: 4, color: '#eab308' },
-    { value: 5, color: '#22c55e' },
-    { value: 2, color: '#ec4899' },
-    { value: 5, color: '#94a3b8' },
-    { value: 3, color: '#3b82f6' },
-]
 
 const pieData = [
     { color: '#ef4444', label: 'Anger' },
@@ -26,74 +18,45 @@ const pieData = [
     { color: '#ec4899', label: 'Love' },
     { color: '#94a3b8', label: 'Neutral' },
     { color: '#3b82f6', label: 'Sadness' },
-]
+];
 
 const dayNightColors = [{
     time: 'day', color: '#4f46e5'
 },
 { time: 'night', color: '#22c55e' }];
 
-const lineData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [
-        {
-            label: 'Morning Mood',
-            data: [1, 2, 1, 0, 2, 2, 2],
-            color: dayNightColors[0].color
-        },
-        {
-            label: 'Evening Mood',
-            data: [0, 1, 2, 1, 1, 2, 2],
-            color: dayNightColors[1].color
-        }
-    ]
-};
-
-// Map numerical data to categorical labels
 const moodCategoryMap: { [key: number]: string } = {
     0: 'Negative',
     1: 'Neutral',
     2: 'Positive'
 };
 
-
-// Component for the Line Graph representation
-const LineGraphComponent = () => (
-    <View style={styles.chartCard}>
-        <Text style={styles.cardTitle}>Weekly Mood Trends</Text>
-        <View style={styles.lineGraphContainer}>
-            <View style={styles.lineGraphYAxis}>
-                <Text style={styles.yAxisLabel}>Positive</Text>
-                <Text style={styles.yAxisLabel}>Neutral</Text>
-                <Text style={styles.yAxisLabel}>Negative</Text>
-            </View>
-            <View style={styles.lineGraphChart}>
-                {lineData.labels.map((day, index) => (
-                    <View key={day} style={styles.lineGraphDay}>
-                        <Text style={styles.dayLabel}>{day}</Text>
-                        {lineData.datasets.map((dataset, dataIndex) => (
-                            <View key={dataIndex} style={styles.pointContainer}>
-                                <View style={[styles.linePoint, { backgroundColor: dataset.color, top: -dataset.data[index] * 20 - 20 }]} />
-                                <Text style={[styles.linePointLabel, { color: dataset.color }]} />
-                            </View>
-                        ))}
-                    </View>
-                ))}
-            </View>
-
-        </View>
-        <View style={{ marginTop: 25, flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 16 }}>
-            {lineData.datasets.map((dataset, index) => (
-                <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-                    <View style={{ width: 12, height: 12, backgroundColor: dataset.color, marginRight: 8 }} />
-                    <Text style={{ color: '#4b5563' }}>{dataset.label}</Text>
-                </View>
-            ))}
-        </View>
-    </View>
-);
-
 export default function Dashboard() {
+    const [dailyMoods, setDailyMoods] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchDailyMoods = async () => {
+            setLoading(true);
+            try {
+                const auth = getAuth();
+                const uid = auth.currentUser?.uid || '';
+                const stored = await AsyncStorage.getItem('DailyMoods');
+                let moods = stored ? JSON.parse(stored) : [];
+                // Only show moods for current user
+                moods = moods.filter((item: any) => item.uid === uid);
+                // Sort by date descending
+                moods.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                setDailyMoods(moods);
+            } catch (e) {
+                console.error('Error loading daily moods:', e);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDailyMoods();
+    }, []);
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container}>
@@ -105,25 +68,55 @@ export default function Dashboard() {
                     <Text style={styles.headerTitle}>Emotion Dashboard</Text>
                 </View>
 
+                {/* Daily Mood Section */}
+                <View style={styles.chartCard}>
+                    <Text style={styles.cardTitle}>Your Daily Moods</Text>
+                    {dailyMoods.length === 0 ? (
+                        <Text style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded.</Text>
+                    ) : (
+                        dailyMoods.map((entry, idx) => (
+                            <View key={idx} style={styles.dailyMoodRow}>
+                                <Text style={styles.dailyMoodDate}>{entry.date}</Text>
+                                <View style={[styles.dailyMoodTag, {
+                                    backgroundColor:
+                                        entry.mood === 0 ? '#ef4444' :
+                                            entry.mood === 1 ? '#eab308' :
+                                                entry.mood === 2 ? '#22c55e' : '#94a3b8'
+                                }]}>
+                                    <Text style={styles.dailyMoodText}>{moodCategoryMap[entry.mood] || entry.mood}</Text>
+                                </View>
+                                <Text style={styles.dailyMoodAbout}>{entry.aboutToday}</Text>
+                            </View>
+                        ))
+                    )}
+                </View>
+
                 {/* Charts Container */}
                 <View style={styles.chartsContainer}>
                     <View style={styles.chartCard}>
                         <Text style={styles.cardTitle}>Monthly Emotion Distribution</Text>
                         <PieChart
                             widthAndHeight={250}
-                            series={serise}
+                            series={[
+                                { value: 10, color: '#ef4444' },
+                                { value: 4, color: '#eab308' },
+                                { value: 5, color: '#22c55e' },
+                                { value: 2, color: '#ec4899' },
+                                { value: 5, color: '#94a3b8' },
+                                { value: 3, color: '#3b82f6' }
+                            ]}
                         />
                         <View style={styles.pieContainer}>
                             {pieData.map((item, index) => (
                                 <View key={index} style={styles.pieItem}>
                                     <View style={[styles.pieColor, { backgroundColor: item.color }]} />
                                     <Text style={styles.pieLabel}>{item.label}</Text>
-                                    <Text style={styles.pieValue}>{serise[index].value}</Text>
+                                    <Text style={styles.pieValue}>{[10, 4, 5, 2, 5, 3][index]}</Text>
                                 </View>
                             ))}
                         </View>
                     </View>
-                    <LineGraphComponent />
+                    {/* ...LineGraphComponent can go here if needed... */}
                 </View>
 
                 {/* Analysis Section */}
@@ -289,5 +282,35 @@ const styles = StyleSheet.create({
     analysisText: {
         color: '#4b5563',
         textAlign: 'center',
+    },
+     dailyMoodRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f1f5f9',
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 8,
+        gap: 10,
+    },
+    dailyMoodDate: {
+        fontSize: 13,
+        color: '#64748b',
+        width: 80,
+    },
+    dailyMoodTag: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 999,
+        marginRight: 8,
+    },
+    dailyMoodText: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: 'white',
+    },
+    dailyMoodAbout: {
+        fontSize: 13,
+        color: '#334155',
+        flex: 1,
     },
 });
