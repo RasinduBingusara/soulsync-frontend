@@ -1,0 +1,326 @@
+import React from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { getCurrentUser, SignOut } from '@/components/custom-function/FireBaseFunctions';
+import { router } from 'expo-router';
+
+// Component to represent a single stat block
+const StatBlock = ({ value, label }:any) => (
+    <View style={styles.statBlock}>
+        <Text style={styles.statValue}>{value}</Text>
+        <Text style={styles.statLabel}>{label}</Text>
+    </View>
+);
+
+// Component to display a recent journal or task entry
+const EntryItem = ({ icon, iconColor, text, subtext }:any) => (
+    <View style={styles.entryItem}>
+        <FontAwesome name={icon} size={16} color={iconColor} style={styles.entryIcon} />
+        <Text style={styles.entryText}>{text}</Text>
+        {subtext && <Text style={styles.entrySubtext}>{subtext}</Text>}
+    </View>
+);
+
+// Component to display an emotion item
+const EmotionItem = ({ icon, iconColor, text, percentage }:any) => (
+    <View style={styles.emotionItem}>
+        <View style={styles.emotionInfo}>
+            <FontAwesome name={icon} size={16} color={iconColor} style={styles.entryIcon} />
+            <Text style={styles.emotionText}>{text}</Text>
+        </View>
+        <Text style={styles.emotionPercentage}>{percentage}</Text>
+    </View>
+);
+
+// Main app component
+export default function App() {
+    return (
+        <SafeAreaView style={styles.safeArea}>
+            <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+                {/* Header Section */}
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>My Profile</Text>
+                </View>
+
+                {/* Profile Card */}
+                <View style={styles.mainCard}>
+
+                    {/* Profile Image */}
+                    <View style={styles.profileImageContainer}>
+                        <FontAwesome name="user-circle" size={100} color="#4f46e5" />
+                    </View>
+
+                    {/* User Info */}
+                    <View style={styles.userInfo}>
+                        <Text style={styles.userName}>{getCurrentUser()?.displayName}</Text>
+                        <Text style={styles.userEmail}>{getCurrentUser()?.email}</Text>
+                    </View>
+
+                    {/* Stats Grid */}
+                    <View style={styles.statsGrid}>
+                        <StatBlock value="14" label="Journals" />
+                        <StatBlock value="8" label="Tasks" />
+                        <StatBlock value="2" label="Posts" />
+                    </View>
+                    
+                    {/* Horizontal Rule */}
+                    <View style={styles.divider} />
+                    
+                    {/* Recent Journals Section */}
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Recent Journals</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.viewAllLink}>View All</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.listContainer}>
+                            <EntryItem 
+                                icon="book-open" 
+                                iconColor="#4f46e5" 
+                                text="Feeling great after a productive day." 
+                                subtext="2 days ago" 
+                            />
+                            <EntryItem 
+                                icon="book-open" 
+                                iconColor="#4f46e5" 
+                                text="I'm a little anxious about tomorrow's meeting." 
+                                subtext="3 days ago" 
+                            />
+                        </View>
+                    </View>
+                    
+                    {/* Ongoing Tasks Section */}
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Ongoing Tasks</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.viewAllLink}>View All</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.listContainer}>
+                            <EntryItem 
+                                icon="check-square" 
+                                iconColor="#22c55e" 
+                                text="Finish report by Friday" 
+                            />
+                            <EntryItem 
+                                icon="square-o" 
+                                iconColor="#6b7280" 
+                                text="Call a friend for coffee" 
+                            />
+                        </View>
+                    </View>
+                    
+                    {/* Top Emotions Section */}
+                    <View style={styles.sectionContainer}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Top Emotions</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.viewAllLink}>View History</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.listContainer}>
+                            <EmotionItem 
+                                icon="smile-o" 
+                                iconColor="#facc15" 
+                                text="Happy" 
+                                percentage="30%" 
+                            />
+                            <EmotionItem 
+                                icon="meh-o" 
+                                iconColor="#3b82f6" 
+                                text="Calm" 
+                                percentage="25%" 
+                            />
+                        </View>
+                    </View>
+
+                    {/* Profile Actions */}
+                    <View style={styles.actionsContainer}>
+                        <TouchableOpacity style={styles.actionButton} onPress={() => { router.push('/(screen)/settings') }}>
+                            <FontAwesome name="cog" size={18} color="#4b5563" style={styles.actionIcon} />
+                            <Text style={styles.actionText}>Settings</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.actionButton}>
+                            <FontAwesome name="edit" size={18} color="#4b5563" style={styles.actionIcon} />
+                            <Text style={styles.actionText}>Edit Profile</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={() => { SignOut() }}>
+                            <FontAwesome name="sign-out" size={18} color="white" style={styles.actionIcon} />
+                            <Text style={styles.logoutText}>Logout</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+            </ScrollView>
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#f3f4f6',
+    },
+    scrollViewContainer: {
+        alignItems: 'center',
+        paddingVertical: 16,
+    },
+    header: {
+        marginBottom: 24,
+        alignItems: 'center',
+    },
+    headerTitle: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#1f2937',
+    },
+    mainCard: {
+        width: '95%',
+        maxWidth: 512,
+        backgroundColor: 'white',
+        borderRadius: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 15,
+        elevation: 5,
+        padding: 24,
+    },
+    profileImageContainer: {
+        marginBottom: 16,
+        alignItems: 'center',
+    },
+    userInfo: {
+        marginBottom: 24,
+        alignItems: 'center',
+    },
+    userName: {
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#1f2937',
+    },
+    userEmail: {
+        fontSize: 14,
+        color: '#6b7280',
+    },
+    statsGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 24,
+    },
+    statBlock: {
+        flex: 1,
+        backgroundColor: '#f3f4f6',
+        borderRadius: 12,
+        padding: 16,
+        marginHorizontal: 4,
+        alignItems: 'center',
+    },
+    statValue: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#374151',
+    },
+    statLabel: {
+        fontSize: 12,
+        color: '#6b7280',
+    },
+    divider: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#d1d5db',
+        marginBottom: 24,
+    },
+    sectionContainer: {
+        marginBottom: 24,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#374151',
+    },
+    viewAllLink: {
+        fontSize: 12,
+        fontWeight: '500',
+        color: '#4f46e5',
+    },
+    listContainer: {
+        backgroundColor: '#f3f4f6',
+        borderRadius: 12,
+        padding: 16,
+        gap: 12,
+    },
+    entryItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    entryIcon: {
+        width: 20,
+        textAlign: 'center',
+    },
+    entryText: {
+        flex: 1,
+        fontSize: 14,
+        color: '#374151',
+    },
+    entrySubtext: {
+        fontSize: 12,
+        color: '#9ca3af',
+    },
+    emotionItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    emotionInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    emotionText: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#374151',
+    },
+    emotionPercentage: {
+        fontSize: 12,
+        color: '#6b7280',
+    },
+    actionsContainer: {
+        gap: 12,
+    },
+    actionButton: {
+        backgroundColor: '#f3f4f6',
+        borderRadius: 12,
+        paddingVertical: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    actionIcon: {
+        // No specific styles needed here, color is set in the component
+    },
+    actionText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#4b5563',
+    },
+    logoutButton: {
+        backgroundColor: '#ef4444',
+    },
+    logoutText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+});

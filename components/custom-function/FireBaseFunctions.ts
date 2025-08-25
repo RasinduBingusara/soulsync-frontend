@@ -1,6 +1,10 @@
 import { addDoc, collection, getFirestore, arrayUnion } from '@react-native-firebase/firestore';
+import { getAuth } from "@react-native-firebase/auth"
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { router } from 'expo-router';
 
 const db = getFirestore();
+const auth = getAuth();
 
 export const saveDailyMood = async (userId:string, mood:string, text:string) => {
   try {
@@ -33,3 +37,23 @@ export const saveDailyMood = async (userId:string, mood:string, text:string) => 
     console.error("Error adding document: ", e);
   }
 };
+
+export const SignOut = async () => {
+    try {
+
+      await GoogleSignin.signOut();
+
+      await auth.signOut();
+
+      router.push('/')
+
+      console.log('User signed out successfully from both Firebase and Google.');
+
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
+  };
+
+export const getCurrentUser = () => {
+    return auth.currentUser;
+  }

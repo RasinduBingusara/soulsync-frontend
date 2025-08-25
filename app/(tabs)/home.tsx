@@ -69,20 +69,6 @@ function HomeScreen() {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-
-      await GoogleSignin.signOut();
-
-      await auth.signOut();
-
-      console.log('User signed out successfully from both Firebase and Google.');
-
-    } catch (error) {
-      console.error('Error during sign out:', error);
-    }
-  };
-
   const getTodayMood = async () => {
     setLoading(true);
     try {
@@ -126,10 +112,10 @@ function HomeScreen() {
         <View style={styles.header}>
           <Text style={styles.greeting}>Hello, {userName}!</Text>
           <View style={styles.headerIcons}>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity style={styles.iconButton} onPress={() => { router.push('/(screen)/profile') }}>
               <FontAwesome name="user-circle" size={28} color="#6b7280" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity style={styles.iconButton} onPress={() => { router.push('/(screen)/settings') }}>
               <FontAwesome name="cog" size={28} color="#6b7280" />
             </TouchableOpacity>
           </View>
