@@ -16,6 +16,7 @@ import { PredictMood } from '@/components/custom-function/MoodPredictor'
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 import { FontAwesome } from '@expo/vector-icons'
 import { saveDailyMood } from '@/components/custom-function/FireBaseFunctions'
+import { ActionSuggest } from '@/components/custom-function/SuggestionProvider'
 
 interface IfeatureBlock {
   title: string
@@ -26,19 +27,24 @@ interface IInteractiveBlock {
   iconName: any,
   subtitle?: string,
   isMain?: boolean,
+  suggestion?: string,
   onPress?: () => void
 }
 
-const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress }: IInteractiveBlock) => {
+const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress, suggestion }: IInteractiveBlock) => {
   return (
     <TouchableOpacity style={isMain ? styles.mainBlock : styles.interactiveBlock} onPress={onPress}>
       {isMain ? (
         <View style={styles.mainBlockContent}>
           <View>
+            <FontAwesome name={iconName} size={24} color="white" />
             <Text style={styles.mainBlockTitle}>{title}</Text>
             <Text style={styles.mainBlockSubtitle}>{subtitle}</Text>
+            {suggestion !== '' && (
+                <Text style={{ color: 'white', fontSize: 12 }}>AI Suggestion: {suggestion}</Text>
+            )}
+
           </View>
-          <FontAwesome name={iconName} size={24} color="white" />
         </View>
       ) : (
         <View style={styles.interactiveBlockContent}>
@@ -54,6 +60,7 @@ function HomeScreen() {
 
   const [userName, setUserName] = useState('Beebyte')
   const [emotionSummary, setEmotionSummary] = useState('How are you feeling right now?')
+  const [suggestedAction, setSuggestedAction] = useState('')
   const [isPopUpVisible, setIsPopUpVisible] = useState(false);
   const [aboutToday, setAboutToday] = useState('')
   const [loading, setLoading] = useState(false);
@@ -77,6 +84,9 @@ function HomeScreen() {
       if (mood) {
         setEmotionSummary(`You seem to be feeling ${mood} today!`);
         console.log(`Predicted mood: ${mood}`);
+        const action = await ActionSuggest(aboutToday);
+        setSuggestedAction(action || '');
+
         const today = new Date().toISOString().slice(0, 10);
         const uid = auth.currentUser?.uid || '';
         const newEntry = { uid, mood, aboutToday, date: today };
@@ -147,6 +157,7 @@ function HomeScreen() {
             iconName="edit"
             isMain={true}
             onPress={() => setIsPopUpVisible(true)}
+            suggestion={suggestedAction}
           />
 
           {/* Grid for other features */}

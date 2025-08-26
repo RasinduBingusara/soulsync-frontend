@@ -77,13 +77,13 @@ export default function App() {
                         </View>
                         <View style={styles.listContainer}>
                             <EntryItem 
-                                icon="book-open" 
+                                icon="book" 
                                 iconColor="#4f46e5" 
                                 text="Feeling great after a productive day." 
                                 subtext="2 days ago" 
                             />
                             <EntryItem 
-                                icon="book-open" 
+                                icon="book" 
                                 iconColor="#4f46e5" 
                                 text="I'm a little anxious about tomorrow's meeting." 
                                 subtext="3 days ago" 
@@ -142,10 +142,6 @@ export default function App() {
                         <TouchableOpacity style={styles.actionButton} onPress={() => { router.push('/(screen)/settings') }}>
                             <FontAwesome name="cog" size={18} color="#4b5563" style={styles.actionIcon} />
                             <Text style={styles.actionText}>Settings</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.actionButton}>
-                            <FontAwesome name="edit" size={18} color="#4b5563" style={styles.actionIcon} />
-                            <Text style={styles.actionText}>Edit Profile</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={() => { SignOut() }}>
                             <FontAwesome name="sign-out" size={18} color="white" style={styles.actionIcon} />
