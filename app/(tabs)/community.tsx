@@ -10,8 +10,11 @@ import { getAuth } from "@react-native-firebase/auth"
 import { FontAwesome } from '@expo/vector-icons';
 import { PostProps } from '@/components/custom-interface/CustomProps';
 
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
 
 function community() {
+  const { t } = useTranslation();
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -65,7 +68,7 @@ function community() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Community Posts</Text>
+        <Text style={styles.headerTitle}>{t('community_list.title')}</Text>
       </View>
 
       {posts[0] ? (
@@ -95,7 +98,7 @@ function community() {
         />
       ) :
         (
-          <Text style={styles.noEntry}>No journals yet</Text>
+          <Text style={styles.noEntry}>{t('community_list.no_entries')}</Text>
         )
       }
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/post_create') }}>

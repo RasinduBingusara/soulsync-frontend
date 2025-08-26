@@ -6,10 +6,12 @@ import { router } from 'expo-router';
 import { JournalEntry } from '@/components/JournalEntry';
 import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getAuth} from "@react-native-firebase/auth"
-
+import { getAuth } from "@react-native-firebase/auth"
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
 
 export default function JournalList() {
+  const { t } = useTranslation();
   const [allJournals, setAllJournals] = useState<IJournalDataResponse[]>([]);
   const [displayedJournals, setDisplayedJournals] = useState<IJournalDataResponse[]>([]);
   const [loading, setLoading] = useState(false);
@@ -21,32 +23,32 @@ export default function JournalList() {
   const fetchAllJournals = async () => {
     setLoading(true);
     try {
-        const existingJournals = await AsyncStorage.getItem('Journals');
-        let journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
+      const existingJournals = await AsyncStorage.getItem('Journals');
+      let journals: IJournalDataResponse[] = existingJournals ? JSON.parse(existingJournals) : [];
 
-        if (user?.uid) {
+      if (user?.uid) {
         journals = journals.filter(journal => journal.uid === user.uid);
       }
-        // Sort all journals by date
-        journals.sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime());
+      // Sort all journals by date
+      journals.sort((a, b) => new Date(b.createAt).getTime() - new Date(a.createAt).getTime());
 
-        setAllJournals(journals);
-        setDisplayedJournals(journals.slice(0, pageSize));
-        setPage(1); 
+      setAllJournals(journals);
+      setDisplayedJournals(journals.slice(0, pageSize));
+      setPage(1);
     } catch (error) {
-        console.error("Failed to load journals from AsyncStorage:", error);
+      console.error("Failed to load journals from AsyncStorage:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
     fetchAllJournals();
-}, []);
+  }, []);
 
-const loadMoreJournals = () => {
+  const loadMoreJournals = () => {
     if (loading) {
-        return;
+      return;
     }
 
     const newPage = page + 1;
@@ -55,7 +57,7 @@ const loadMoreJournals = () => {
 
     // Check if there are more journals to load
     if (startIndex >= allJournals.length) {
-        return; // No more journals
+      return; // No more journals
     }
 
     setLoading(true);
@@ -63,7 +65,7 @@ const loadMoreJournals = () => {
     setDisplayedJournals(prevJournals => [...prevJournals, ...nextBatch]);
     setPage(newPage);
     setLoading(false);
-};
+  };
 
   const onRefresh = useCallback(async () => {
     setLoading(true);
@@ -97,7 +99,7 @@ const loadMoreJournals = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Journal Entries</Text>
+        <Text style={styles.headerTitle}>{t('journal_list.title')}</Text>
       </View>
       {displayedJournals.length > 0 ? (
         <FlatList
@@ -119,12 +121,12 @@ const loadMoreJournals = () => {
             />
           }
           onEndReached={loadMoreJournals}
-          onEndReachedThreshold={0.5} 
+          onEndReachedThreshold={0.5}
           contentContainerStyle={styles.entriesList}
         />
       ) :
         (
-          <Text style={styles.noEntry}>No journals yet</Text>
+          <Text style={styles.noEntry}>{t('journal_list.no_entries')}</Text>
         )
       }
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/journal_create') }}>

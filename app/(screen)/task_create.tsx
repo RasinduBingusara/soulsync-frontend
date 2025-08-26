@@ -9,6 +9,8 @@ import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where
 import { TPriority } from '@/components/custom-interface/type';
 import { PredictSuggestion } from '@/components/custom-function/SuggestionProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
 
 interface ICheckBox {
   text: string,
@@ -17,6 +19,7 @@ interface ICheckBox {
 
 
 export default function TaskCreate() {
+  const {t} = useTranslation();
   const [taskTitle, setTaskTitle] = useState('');
   const [taskContent, setTaskContent] = useState('');
 
@@ -119,16 +122,16 @@ export default function TaskCreate() {
           <TouchableOpacity style={styles.backButton} onPress={() => router.push('..')}>
             <FontAwesome name="arrow-left" size={24} color="#6b7280" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Create New Task</Text>
+          <Text style={styles.headerTitle}>{t('task.create_new_task')}</Text>
         </View>
 
         <View style={styles.formSection}>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Task Title</Text>
+            <Text style={styles.inputLabel}>{t('task.task_title')}</Text>
             <TextInput
               style={styles.textInput}
-              placeholder="e.g., Finish Project Report"
+              placeholder={t('task.finish_project_report')}
               placeholderTextColor="#9ca3af"
               onChangeText={setTaskTitle}
               value={taskTitle}
@@ -136,10 +139,10 @@ export default function TaskCreate() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Description</Text>
+            <Text style={styles.inputLabel}>{t('task.description')}</Text>
             <TextInput
               style={styles.textArea}
-              placeholder="Add more details about your task..."
+              placeholder={t('task.add_more_details')}
               placeholderTextColor="#9ca3af"
               multiline={true}
               numberOfLines={4}
@@ -151,7 +154,7 @@ export default function TaskCreate() {
 
           {/* Sub tasks */}
           <View style={styles.checklistSection}>
-            <Text style={styles.checklistTitle}>Sub-tasks / Checklist</Text>
+            <Text style={styles.checklistTitle}>{t('task.subtasks_checklist')}</Text>
             <View style={styles.checklistContainer}>
 
               {checklist.map((item, index) => (
@@ -172,7 +175,7 @@ export default function TaskCreate() {
             <View style={styles.addChecklistContainer}>
               <TextInput
                 style={styles.subTaskInput}
-                placeholder="Add a sub-task"
+                placeholder={t('task.add_subtask')}
                 placeholderTextColor="#9ca3af"
                 onChangeText={setSubTaskText}
                 value={subTaskText}
@@ -185,7 +188,7 @@ export default function TaskCreate() {
 
           <View style={styles.gridContainer}>
             <View style={styles.relativeInput}>
-              <Text style={styles.inputLabel}>Due Date</Text>
+              <Text style={styles.inputLabel}>{t('task.due_date')}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="YYYY-MM-DD"
@@ -195,7 +198,7 @@ export default function TaskCreate() {
               />
             </View>
             <View style={styles.relativeInput}>
-              <Text style={styles.inputLabel}>Due Time</Text>
+              <Text style={styles.inputLabel}>{t('task.due_time')}</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="HH:MM"
@@ -205,23 +208,23 @@ export default function TaskCreate() {
               />
             </View>
             <View style={styles.priorityList}>
-              <Text style={styles.inputLabel}>Priority</Text>
+              <Text style={styles.inputLabel}>{t('task.priority')}</Text>
               <TouchableOpacity style={[styles.priorityButton, { backgroundColor: '#9e9e9eff' }]} onPress={() => { setPriority('low') }}>
-                <Text style={styles.createButtonText}>Low</Text>
+                <Text style={styles.createButtonText}>{t('task.low')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.priorityButton, { backgroundColor: '#1264deff' }]} onPress={() => { setPriority('medium') }}>
-                <Text style={styles.createButtonText}>Medium</Text>
+                <Text style={styles.createButtonText}>{t('task.medium')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.priorityButton, { backgroundColor: '#e54646ff' }]} onPress={() => { setPriority('high') }}>
-                <Text style={styles.createButtonText}>High</Text>
+                <Text style={styles.createButtonText}>{t('task.high')}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {
-            loading || isPredicting ? <Text style={{ textAlign: 'center', marginBottom: 10, color: '#6b7280' }}>Creating Task...</Text> : (
+            loading || isPredicting ? <Text style={{ textAlign: 'center', marginBottom: 10, color: '#6b7280' }}>{t('task.creating_task')}</Text> : (
               <TouchableOpacity style={styles.createButton} onPress={() => createTask(checklist)}>
-                <Text style={styles.createButtonText}>Create Task</Text>
+                <Text style={styles.createButtonText}>{t('task.create_task')}</Text>
               </TouchableOpacity>
             )
           }

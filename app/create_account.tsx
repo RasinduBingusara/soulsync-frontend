@@ -11,8 +11,12 @@ import {
     Platform,
     ScrollView
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
+
 
 const CreateAccountScreen = () => {
+    const { t } = useTranslation();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -39,27 +43,27 @@ const CreateAccountScreen = () => {
                     <View style={styles.container}>
                         {/* Header */}
                         <View style={styles.header}>
-                            <Text style={styles.headerTitle}>Create Your Account</Text>
-                            <Text style={styles.headerSubtitle}>Join our community today</Text>
+                            <Text style={styles.headerTitle}>{t('create_account.title')}</Text>
+                            <Text style={styles.headerSubtitle}>{t('create_account.subtitle')}</Text>
                         </View>
 
                         {/* Form */}
                         <View style={styles.form}>
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Username</Text>
+                                <Text style={styles.label}>{t('create_account.username')}</Text>
                                 <TextInput
                                     style={styles.input}
                                     onChangeText={setUsername}
                                     value={username}
                                     autoCapitalize="none"
                                     autoCorrect={false}
-                                    placeholder="Choose a username"
+                                    placeholder={t('create_account.username_placeholder')}
                                     placeholderTextColor="#9ca3af"
                                 />
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Email address</Text>
+                                <Text style={styles.label}>{t('create_account.email_address')}</Text>
                                 <TextInput
                                     style={styles.input}
                                     onChangeText={setEmail}
@@ -67,25 +71,25 @@ const CreateAccountScreen = () => {
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     autoCorrect={false}
-                                    placeholder="name@example.com"
+                                    placeholder={t('create_account.email_placeholder')}
                                     placeholderTextColor="#9ca3af"
                                 />
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Password</Text>
+                                <Text style={styles.label}>{t('create_account.password')}</Text>
                                 <TextInput
                                     style={styles.input}
                                     onChangeText={setPassword}
                                     value={password}
                                     secureTextEntry
-                                    placeholder="********"
+                                    placeholder={t('create_account.password_placeholder')}
                                     placeholderTextColor="#9ca3af"
                                 />
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Confirm password</Text>
+                                <Text style={styles.label}>{t('create_account.confirm_password')}</Text>
                                 <TextInput
                                     style={styles.input}
                                     onChangeText={setConfirmPassword}
@@ -98,7 +102,7 @@ const CreateAccountScreen = () => {
 
                             <View style={styles.createAccountButtonContainer}>
                                 <TouchableOpacity style={styles.createAccountButton} onPress={handleCreateAccount}>
-                                    <Text style={styles.createAccountButtonText}>Create Account</Text>
+                                    <Text style={styles.createAccountButtonText}>{t('create_account.create_account_button')}</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -106,10 +110,10 @@ const CreateAccountScreen = () => {
                         {/* Sign In Link */}
                         <View style={styles.signInLinkContainer}>
                             <Text style={styles.signInLinkText}>
-                                Already have an account?
+                                {t('create_account.already_have_account')}
                             </Text>
                             <TouchableOpacity onPress={() => { router.push('/') }}>
-                                <Text style={styles.signInLink}>Sign in</Text>
+                                <Text style={styles.signInLink}>{t('create_account.sign_in')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

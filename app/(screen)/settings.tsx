@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, Switch, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FontAwesome } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 // --- Reusable Settings Item Component ---
 const SettingsItem = ({ label, children, isLastItem }: any) => {
@@ -16,12 +20,46 @@ const SettingsItem = ({ label, children, isLastItem }: any) => {
 
 // --- Main Settings Screen Component ---
 export default function App() {
+
+    const { t, i18n } = useTranslation();
+
     const [isDarkTheme, setIsDarkTheme] = useState(false);
+    const [enTranslate, setEnTranslate] = useState(false);
     const [emailNotifications, setEmailNotifications] = useState(true);
     const [journalReminders, setJournalReminders] = useState(false);
     const [taskUpdates, setTaskUpdates] = useState(true);
     const [pushNotifications, setPushNotifications] = useState(true);
     const [dataSharing, setDataSharing] = useState(false);
+
+    const changeLanguage = async (lng: any) => {
+        await i18n.changeLanguage(lng);
+        await AsyncStorage.setItem('selected-language', lng);
+    };
+    useEffect(() => {
+        const getSelectedLanguage = async () => {
+            const storedLang = await AsyncStorage.getItem('selected-language');
+            if (storedLang === 'en') {
+                setEnTranslate(false);
+            } else {
+                setEnTranslate(true);
+            }
+        };
+        getSelectedLanguage();
+    }, []);
+
+    
+
+    const toggleLanguage = () => {
+        setEnTranslate(previousState => !previousState);
+        if (enTranslate) {
+            changeLanguage('en');
+            setEnTranslate(false);
+        }
+        else {
+            changeLanguage('si');
+            setEnTranslate(true);
+        }
+    }
 
     // Function to toggle the theme
     const toggleTheme = () => setIsDarkTheme(previousState => !previousState);
@@ -42,35 +80,40 @@ export default function App() {
         <SafeAreaView style={combinedStyles.container}>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)/home')}>
+                    <FontAwesome name="arrow-left" size={24} color="#6b7280" />
+                </TouchableOpacity>
                 <View style={styles.header}>
-                    <Text style={combinedStyles.headerText}>Settings</Text>
+                    <Text style={combinedStyles.headerText}>{t('settings.settings')}</Text>
                 </View>
 
                 <View style={combinedStyles.card}>
                     <View style={styles.section}>
-                        <Text style={combinedStyles.sectionTitle}>Account</Text>
-                        <SettingsItem label="Theme">
+                        <Text style={combinedStyles.sectionTitle}>{t('settings.account')}</Text>
+                        <SettingsItem label={t('settings.language')}>
+                            <Switch
+                                ios_backgroundColor={isDarkTheme ? '#4f46e5' : '#ccc'}
+                                onValueChange={toggleLanguage}
+                                value={enTranslate}
+                            />
+                        </SettingsItem>
+                        <SettingsItem label={t('settings.theme')}>
                             <Switch
                                 ios_backgroundColor={isDarkTheme ? '#4f46e5' : '#ccc'}
                                 onValueChange={toggleTheme}
                                 value={isDarkTheme}
                             />
                         </SettingsItem>
-                        <SettingsItem label="Change Password">
-                            <TouchableOpacity onPress={() => console.log('Change Password pressed')}>
-                                <Text style={combinedStyles.linkText}>Edit</Text>
-                            </TouchableOpacity>
-                        </SettingsItem>
-                        <SettingsItem label="Email Notifications">
+                        <SettingsItem label={t('settings.email_notifications')}>
                             <Switch
                                 ios_backgroundColor={emailNotifications ? '#4f46e5' : '#ccc'}
                                 onValueChange={setEmailNotifications}
                                 value={emailNotifications}
                             />
                         </SettingsItem>
-                        <SettingsItem label="Delete Account" isLastItem>
+                        <SettingsItem label={t('settings.delete_account')} isLastItem>
                             <TouchableOpacity onPress={() => console.log('Delete Account pressed')}>
-                                <Text style={combinedStyles.deleteButtonText}>Delete</Text>
+                                <Text style={combinedStyles.deleteButtonText}>{t('settings.delete')}</Text>
                             </TouchableOpacity>
                         </SettingsItem>
                     </View>
@@ -78,22 +121,22 @@ export default function App() {
                     <View style={combinedStyles.separator} />
 
                     <View style={styles.section}>
-                        <Text style={combinedStyles.sectionTitle}>Notifications</Text>
-                        <SettingsItem label="Journal Reminders">
+                        <Text style={combinedStyles.sectionTitle}>{t('settings.notifications')}</Text>
+                        <SettingsItem label={t('settings.journal_reminders')}>
                             <Switch
                                 ios_backgroundColor={journalReminders ? '#4f46e5' : '#ccc'}
                                 onValueChange={setJournalReminders}
                                 value={journalReminders}
                             />
                         </SettingsItem>
-                        <SettingsItem label="Task Updates">
+                        <SettingsItem label={t('settings.task_updates')}>
                             <Switch
                                 ios_backgroundColor={taskUpdates ? '#4f46e5' : '#ccc'}
                                 onValueChange={setTaskUpdates}
                                 value={taskUpdates}
                             />
                         </SettingsItem>
-                        <SettingsItem label="Push Notifications" isLastItem>
+                        <SettingsItem label={t('settings.push_notifications')} isLastItem>
                             <Switch
                                 ios_backgroundColor={pushNotifications ? '#4f46e5' : '#ccc'}
                                 onValueChange={setPushNotifications}
@@ -105,17 +148,17 @@ export default function App() {
                     <View style={combinedStyles.separator} />
 
                     <View style={styles.section}>
-                        <Text style={combinedStyles.sectionTitle}>Privacy</Text>
-                        <SettingsItem label="Data Sharing">
+                        <Text style={combinedStyles.sectionTitle}>{t('settings.privacy')}</Text>
+                        {/* <SettingsItem label="Data Sharing">
                             <Switch
                                 ios_backgroundColor={dataSharing ? '#4f46e5' : '#ccc'}
                                 onValueChange={setDataSharing}
                                 value={dataSharing}
                             />
-                        </SettingsItem>
-                        <SettingsItem label="View Privacy Policy" isLastItem>
+                        </SettingsItem> */}
+                        <SettingsItem label={t('settings.view_privacy_policy')} isLastItem>
                             <TouchableOpacity onPress={() => console.log('View Privacy Policy pressed')}>
-                                <Text style={combinedStyles.linkText}>View</Text>
+                                <Text style={combinedStyles.linkText}>{t('settings.view')}</Text>
                             </TouchableOpacity>
                         </SettingsItem>
                     </View>
@@ -195,6 +238,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#e5e7eb',
         marginVertical: 16,
     },
+    backButton: {
+        padding: 8,
+    }
 });
 
 // --- Theme-specific styles ---
@@ -220,6 +266,9 @@ const lightStyles = StyleSheet.create({
     separator: {
         backgroundColor: '#e5e7eb',
     },
+    backButton: {
+        padding: 8,
+    }
 });
 
 const darkStyles = StyleSheet.create({
@@ -244,4 +293,7 @@ const darkStyles = StyleSheet.create({
     separator: {
         backgroundColor: '#4a5568',
     },
+    backButton: {
+        padding: 8,
+    }
 });

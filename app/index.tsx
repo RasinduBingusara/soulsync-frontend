@@ -7,8 +7,12 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, up
 import { FirebaseError } from 'firebase/app'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
+
 
 export default function Auth() {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
@@ -98,27 +102,27 @@ export default function Auth() {
             >
                 <View style={styles.container}>
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Welcome Back</Text>
-                        <Text style={styles.headerSubtitle}>Sign in to your account</Text>
+                        <Text style={styles.headerTitle}>{t('auth.welcome_back')}</Text>
+                        <Text style={styles.headerSubtitle}>{t('auth.sign_in_to_account')}</Text>
                     </View>
 
                     <View style={styles.socialLoginContainer}>
                         <TouchableOpacity style={styles.googleButton} onPress={() => SignInWithGoogleAuthentication()} disabled={loading}>
                             <FontAwesome name="google" size={24} color="black" style={styles.googleButtonIcon} />
-                            <Text style={styles.googleButtonText}>Sign in with Google</Text>
+                            <Text style={styles.googleButtonText}>{t('auth.sign_in_with_google')}</Text>
                         </TouchableOpacity>
                     </View>
 
                     <View style={styles.dividerContainer}>
                         <View style={styles.dividerLine} />
-                        <Text style={styles.dividerText}>Or continue with</Text>
+                        <Text style={styles.dividerText}>{t('auth.or_continue_with')}</Text>
                         <View style={styles.dividerLine} />
                     </View>
 
                     {/* Email & Password Form */}
                     <View style={styles.form}>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Email address</Text>
+                            <Text style={styles.label}>{t('auth.email_address')}</Text>
                             <TextInput
                                 style={styles.input}
                                 onChangeText={setEmail}
@@ -132,7 +136,7 @@ export default function Auth() {
                         </View>
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Password</Text>
+                            <Text style={styles.label}>{t('auth.password')}</Text>
                             <TextInput
                                 style={styles.input}
                                 onChangeText={setPassword}
@@ -145,22 +149,22 @@ export default function Auth() {
 
                         <View style={styles.forgotPasswordContainer}>
                             <TouchableOpacity>
-                                <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
+                                <Text style={styles.forgotPasswordText}>{t('auth.forgot_password')}</Text>
                             </TouchableOpacity>
                         </View>
 
                         <View style={styles.signInButtonContainer}>
                             <TouchableOpacity style={styles.signInButton} onPress={SignIn} disabled={loading}>
-                                <Text style={styles.signInButtonText}>Sign in</Text>
+                                <Text style={styles.signInButtonText}>{t('auth.sign_in')}</Text>
                             </TouchableOpacity>
                         </View>
 
                         <View style={styles.signInLinkContainer}>
                             <Text style={styles.signInLinkText}>
-                                Don't have an account?
+                                {t('auth.no_account_question')}
                             </Text>
                             <TouchableOpacity onPress={() => { router.push('/create_account') }}>
-                                <Text style={styles.signInLink}>Create account</Text>
+                                <Text style={styles.signInLink}>{t('auth.create_account')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

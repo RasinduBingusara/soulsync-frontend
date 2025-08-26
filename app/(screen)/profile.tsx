@@ -4,6 +4,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getCurrentUser, SignOut } from '@/components/custom-function/FireBaseFunctions';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
+
 
 // Component to represent a single stat block
 const StatBlock = ({ value, label }:any) => (
@@ -34,13 +37,14 @@ const EmotionItem = ({ icon, iconColor, text, percentage }:any) => (
 );
 
 // Main app component
-export default function App() {
+export default function Profile() {
+    const {t} = useTranslation();
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 {/* Header Section */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>My Profile</Text>
+                    <Text style={styles.headerTitle}>{t('profile.title')}</Text>
                 </View>
 
                 {/* Profile Card */}
@@ -59,9 +63,9 @@ export default function App() {
 
                     {/* Stats Grid */}
                     <View style={styles.statsGrid}>
-                        <StatBlock value="14" label="Journals" />
-                        <StatBlock value="8" label="Tasks" />
-                        <StatBlock value="2" label="Posts" />
+                        <StatBlock value="14" label={t('profile.journals')} />
+                        <StatBlock value="8" label={t('profile.tasks')} />
+                        <StatBlock value="2" label={t('profile.posts')} />
                     </View>
                     
                     {/* Horizontal Rule */}
@@ -70,9 +74,9 @@ export default function App() {
                     {/* Recent Journals Section */}
                     <View style={styles.sectionContainer}>
                         <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Recent Journals</Text>
+                            <Text style={styles.sectionTitle}>{t('profile.recent_journals')}</Text>
                             <TouchableOpacity>
-                                <Text style={styles.viewAllLink}>View All</Text>
+                                <Text style={styles.viewAllLink}>{t('profile.view_all')}</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.listContainer}>
@@ -94,9 +98,9 @@ export default function App() {
                     {/* Ongoing Tasks Section */}
                     <View style={styles.sectionContainer}>
                         <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Ongoing Tasks</Text>
+                            <Text style={styles.sectionTitle}>{t('profile.ongoing_tasks')}</Text>
                             <TouchableOpacity>
-                                <Text style={styles.viewAllLink}>View All</Text>
+                                <Text style={styles.viewAllLink}>{t('profile.view_all')}</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.listContainer}>
@@ -116,9 +120,9 @@ export default function App() {
                     {/* Top Emotions Section */}
                     <View style={styles.sectionContainer}>
                         <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Top Emotions</Text>
+                            <Text style={styles.sectionTitle}>{t('profile.top_emotions')}</Text>
                             <TouchableOpacity>
-                                <Text style={styles.viewAllLink}>View History</Text>
+                                <Text style={styles.viewAllLink}>{t('profile.view_history')}</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.listContainer}>
@@ -141,11 +145,11 @@ export default function App() {
                     <View style={styles.actionsContainer}>
                         <TouchableOpacity style={styles.actionButton} onPress={() => { router.push('/(screen)/settings') }}>
                             <FontAwesome name="cog" size={18} color="#4b5563" style={styles.actionIcon} />
-                            <Text style={styles.actionText}>Settings</Text>
+                            <Text style={styles.actionText}>{t('profile.settings')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={() => { SignOut() }}>
                             <FontAwesome name="sign-out" size={18} color="white" style={styles.actionIcon} />
-                            <Text style={styles.logoutText}>Logout</Text>
+                            <Text style={styles.logoutText}>{t('profile.logout')}</Text>
                         </TouchableOpacity>
                     </View>
 

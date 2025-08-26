@@ -6,6 +6,8 @@ import { router } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PredictMood } from '@/components/custom-function/MoodPredictor';
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
 
 interface checkBoxInter {
   isChecked: boolean;
@@ -25,6 +27,7 @@ const Checkbox = ({ isChecked, onToggle, label }: checkBoxInter) => {
 };
 
 const CreatePost = () => {
+  const {t} = useTranslation();
   const [content, setContent] = useState('');
   const [isAnonymouse, setIsAnonymouse] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -76,20 +79,21 @@ const CreatePost = () => {
           <TouchableOpacity style={styles.backButton} onPress={() => router.push('..')}>
             <FontAwesome name="arrow-left" size={24} color="#6b7280" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Create New Post</Text>
+          <Text style={styles.headerTitle}>{t('post.create_post_title')}</Text>
         </View>
         <TextInput
           style={[styles.input, styles.contentInput]}
-          placeholder="What's on your mind?"
+          placeholder={t('post.placeholder')}
           value={content}
           onChangeText={setContent}
+          placeholderTextColor="#6b7280"
           multiline
           textAlignVertical="top"
         />
         <Checkbox
           isChecked={isAnonymouse}
           onToggle={() => { setIsAnonymouse(!isAnonymouse) }}
-          label='Anonymouse'
+          label={t('post.anonymous')}
         />
         {
           isMoodPredicting && (
@@ -104,7 +108,7 @@ const CreatePost = () => {
             <ActivityIndicator size={'small'} style={{ margin: 28 }} />
           ) : (
             <Button
-              title="Create Post"
+              title={t('post.create_post')}
               onPress={createPost}
               color="#007AFF"
             />

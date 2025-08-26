@@ -10,9 +10,12 @@ import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where
 import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
 import { PredictMood } from '@/components/custom-function/MoodPredictor';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
 
 
 export default function JournalCreate() {
+    const { t } = useTranslation();
 
     const [lastJournals, setLastJournals] = useState<IJournalDataResponse[]>([]);
     const [loading, setLoading] = useState(false);
@@ -20,35 +23,6 @@ export default function JournalCreate() {
     const [isMoodPredicting, setIsMoodPredicting] = useState(false);
 
     const user = getAuth().currentUser;
-
-    // const getLastJournals = async (count: number) => {
-
-    //     setLoading(true);
-    //     const lastJournals: IJournalDataResponse[] = [];
-    //     try {
-    //         const journalsRef = collection(db, "Journals");
-    //         const q = query(
-    //             journalsRef,
-    //             where("uid", "==", user?.uid),
-    //             orderBy("createAt", "desc"),
-    //             limit(count)
-    //         );
-
-    //         const querySnapshot = await getDocs(q);
-
-    //         querySnapshot.forEach((doc: any) => {
-    //             lastJournals.push(doc.data());
-    //         });
-
-    //     }
-    //     catch (error) {
-    //         console.error("Failed to load tasks:", error);
-    //     }
-    //     finally {
-    //         setLastJournals(lastJournals);
-    //         setLoading(false);
-    //     }
-    // }
 
     const getLastJournals = async (count: number) => {
 
@@ -75,41 +49,6 @@ export default function JournalCreate() {
         }
     }
 
-
-    // const saveJournal = async () => {
-
-    //     if (!content) {
-    //         Alert.alert('No content to save');
-    //         return;
-    //     }
-    //     setLoading(true);
-    //     try {
-    //         setIsMoodPredicting(true);
-    //         const mood = await PredictMood(content);
-    //         setIsMoodPredicting(false);
-    //         if (!mood) {
-    //             setLoading(false);
-    //             return;
-    //         }
-
-    //         const timestamp = new Date().toISOString();
-    //         const docRef = await addDoc(collection(db, 'Journals'), {
-    //             uid: user?.uid,
-    //             createAt: timestamp,
-    //             content: content,
-    //             mood: mood,
-    //         })
-    //         console.log('Post created with ID: ', docRef.id);
-    //         setContent('');
-    //         router.push('/(tabs)/journal-list')
-    //     }
-    //     catch (e) {
-    //         console.log('Error saving journal: ', e)
-    //     }
-    //     finally {
-    //         setLoading(false);
-    //     }
-    // }
 
     const saveJournal = async () => {
 
@@ -168,20 +107,20 @@ export default function JournalCreate() {
                 <TouchableOpacity style={styles.backButton} onPress={() => { router.push('..') }}>
                     <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Daily Journal</Text>
+                <Text style={styles.headerTitle}>{t('journal.daily_journal')}</Text>
             </View>
 
             <View style={styles.contentContainer}>
 
                 <View style={styles.formSection}>
-                    <Text style={styles.formTitle}>How are you feeling today?</Text>
+                    <Text style={styles.formTitle}>{t('journal.how_are_you_feeling')}</Text>
 
                     {/* The Write Your Entry Section */}
                     <View style={styles.inputGroupContainer}>
-                        <Text style={styles.inputLabel}>Write your entry</Text>
+                        <Text style={styles.inputLabel}>{t('journal.write_your_entry')}</Text>
                         <TextInput
                             style={styles.textArea}
-                            placeholder="Share your thoughts..."
+                            placeholder={t('journal.share_your_thoughts_placeholder')}
                             placeholderTextColor="#9ca3af"
                             multiline={true}
                             numberOfLines={5}
@@ -194,7 +133,7 @@ export default function JournalCreate() {
                         isMoodPredicting && (
                             <View style={{ marginVertical: 10 }}>
                                 <ActivityIndicator size="small" color="#007AFF" />
-                                <Text style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>Predicting Mood...</Text>
+                                <Text style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>{t('journal.predicting_mood')}</Text>
                             </View>
                         )
                     }
@@ -205,7 +144,7 @@ export default function JournalCreate() {
                         ) :
                             (
                                 <TouchableOpacity style={styles.saveButton} onPress={saveJournal}>
-                                    <Text style={styles.saveButtonText}>Save Entry</Text>
+                                    <Text style={styles.saveButtonText}>{t('journal.save_entry')}</Text>
                                 </TouchableOpacity>
                             )
                     }
@@ -214,7 +153,7 @@ export default function JournalCreate() {
             </View>
 
             <View style={styles.previousEntriesSection}>
-                <Text style={styles.previousEntriesTitle}>Previous Entries</Text>
+                <Text style={styles.previousEntriesTitle}>{t('journal.previous_entries')}</Text>
                 <View style={styles.entriesList}>
                     {lastJournals[0] ? (
                         <FlatList
@@ -230,7 +169,7 @@ export default function JournalCreate() {
                         />
                     ) :
                         (
-                            <Text style={styles.noEntry}>No journals yet</Text>
+                            <Text style={styles.noEntry}>{t('journal.no_journals_yet')}</Text>
                         )
                     }
 

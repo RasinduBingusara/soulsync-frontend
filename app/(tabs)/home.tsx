@@ -17,6 +17,8 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 import { FontAwesome } from '@expo/vector-icons'
 import { saveDailyMood } from '@/components/custom-function/FireBaseFunctions'
 import { ActionSuggest } from '@/components/custom-function/SuggestionProvider'
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
 
 interface IfeatureBlock {
   title: string
@@ -57,9 +59,10 @@ const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress, 
 };
 
 function HomeScreen() {
+  const { t } = useTranslation();
 
   const [userName, setUserName] = useState('Beebyte')
-  const [emotionSummary, setEmotionSummary] = useState('How are you feeling right now?')
+  const [emotionSummary, setEmotionSummary] = useState(t('home.how_are_you'))
   const [suggestedAction, setSuggestedAction] = useState('')
   const [isPopUpVisible, setIsPopUpVisible] = useState(false);
   const [aboutToday, setAboutToday] = useState('')
@@ -137,7 +140,7 @@ function HomeScreen() {
       <ScrollView style={styles.scrollView}>
         {/* Header Section */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Hello, {userName}!</Text>
+          <Text style={styles.greeting}>{t('home.greeting', { name: userName })}</Text>
           <View style={styles.headerIcons}>
             <TouchableOpacity style={styles.iconButton} onPress={() => { router.push('/(screen)/profile') }}>
               <FontAwesome name="user-circle" size={28} color="#6b7280" />
@@ -152,7 +155,7 @@ function HomeScreen() {
         <View style={styles.mainCard}>
           {/* Daily Check-in */}
           <InteractiveBlock
-            title="Check-in Today"
+            title={t('home.checkin_today')}
             subtitle={emotionSummary}
             iconName="edit"
             isMain={true}
@@ -162,12 +165,12 @@ function HomeScreen() {
 
           {/* Grid for other features */}
           <View style={styles.gridContainer}>
-            <InteractiveBlock title="Chatbot" iconName="comments" onPress={() => { router.push('/(screen)/chat_bot') }} />
-            <InteractiveBlock title="Dashboard" iconName="pie-chart" onPress={() => { router.push('/(screen)/dashboard') }} />
-            <InteractiveBlock title="Journal" iconName="book" onPress={() => { router.push('/(screen)/journal_create') }} />
-            <InteractiveBlock title="Tasks" iconName="tasks" onPress={() => { router.push('/(screen)/task_create') }} />
-            <InteractiveBlock title="Community" iconName="commenting" onPress={() => { router.push('/(screen)/post_create') }} />
-            <InteractiveBlock title="Learning Zone" iconName="graduation-cap" />
+            <InteractiveBlock title={t('home.chatbot')} iconName="comments" onPress={() => { router.push('/(screen)/chat_bot') }} />
+            <InteractiveBlock title={t('home.dashboard')} iconName="pie-chart" onPress={() => { router.push('/(screen)/dashboard') }} />
+            <InteractiveBlock title={t('home.journal')} iconName="book" onPress={() => { router.push('/(screen)/journal_create') }} />
+            <InteractiveBlock title={t('home.tasks')} iconName="tasks" onPress={() => { router.push('/(screen)/task_create') }} />
+            <InteractiveBlock title={t('home.community')} iconName="commenting" onPress={() => { router.push('/(screen)/post_create') }} />
+            <InteractiveBlock title={t('home.learning_zone')} iconName="graduation-cap" />
           </View>
         </View>
       </ScrollView>
@@ -191,17 +194,17 @@ function HomeScreen() {
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
 
-            <Text style={styles.modalHeader}>How about your day?</Text>
+            <Text style={styles.modalHeader}>{t('home.how_about_your_day')}</Text>
             <ScrollView style={styles.messageScrollView}>
               <CustomTextInput
                 type='area'
-                label="Tell us about your day"
-                placeholder="Enter your message here..."
+                label={t('home.tell_us_about_your_day')}
+                placeholder={t('home.enter_message_placeholder')}
                 value={aboutToday}
                 setValue={(value) => setAboutToday(value)}
               />
               <CustomButton
-                text='Submit'
+                text={t('home.submit')}
                 pressable={aboutToday.length > 0 ? true : false}
                 fontSize={16}
                 onPress={() => {

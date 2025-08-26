@@ -9,10 +9,11 @@ import TaskItem from '@/components/Task';
 import { TPriority } from '@/components/custom-interface/type';
 import { ITask } from '@/components/custom-interface/CustomProps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useTranslation } from 'react-i18next';
+import '@/components/translation/i18n';
 
 export default function TaskList() {
-
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [latestTasks, setLatestTasks] = useState<ITask[]>([]);
 
@@ -117,7 +118,7 @@ export default function TaskList() {
 
                 {/* Header Section */}
                 <View style={styles.headerContainer}>
-                    <Text style={styles.headerTitle}>My Tasks</Text>
+                    <Text style={styles.headerTitle}>{t('task_list.title')}</Text>
                 </View>
 
                 <FlatList
