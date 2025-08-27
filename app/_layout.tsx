@@ -71,6 +71,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="index" options={{headerShown:false}}/>
         <Stack.Screen name="create_account" options={{headerShown:false}}/>
+        <Stack.Screen name="forgot_password" options={{headerShown:false}}/>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(screen)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />

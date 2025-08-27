@@ -1,23 +1,22 @@
-import { ThemedText } from '@/components/ThemedText'
-import { useEffect, useState } from 'react'
-import { View, Button, ActivityIndicator, KeyboardAvoidingView, StyleSheet, Platform, TouchableOpacity } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "@react-native-firebase/auth"
-import { FirebaseError } from 'firebase/app'
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import { router } from 'expo-router';
-import { useTranslation } from 'react-i18next';
-import '@/components/translation/i18n';
-import { ThemedView } from '@/components/ThemedView';
 import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import '@/components/translation/i18n';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword } from "@react-native-firebase/auth";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { router } from 'expo-router';
+import { FirebaseError } from 'firebase/app';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function Auth() {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [displayName, setDisplayName] = useState('');
     const [loading, setLoading] = useState(false);
 
     const auth = getAuth();
@@ -59,26 +58,6 @@ export default function Auth() {
         }
     };
 
-    const SignUp = async () => {
-        console.log(displayName);
-        setLoading(true);
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            await updateProfile(user, { displayName: displayName });
-            console.log("User's Display Name:", user.displayName);
-            alert('Check your emails!')
-        }
-        catch (error) {
-            const err = error as FirebaseError;
-            alert('Registration failed: ' + err.message);
-        }
-        finally {
-            setLoading(false);
-        }
-    }
-
     const SignIn = async () => {
         setLoading(true);
         try {
@@ -86,6 +65,7 @@ export default function Auth() {
             console.log('password: ', password);
             await signInWithEmailAndPassword(auth, email, password);
             alert('Check your emails!')
+            router.push('/(tabs)/home');
         }
         catch (error) {
             const err = error as FirebaseError;
@@ -150,7 +130,7 @@ export default function Auth() {
                         </View>
 
                         <View style={styles.forgotPasswordContainer}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => { router.push('/forgot_password') }}>
                                 <ThemedText style={styles.forgotPasswordText}>{t('auth.forgot_password')}</ThemedText>
                             </TouchableOpacity>
                         </View>

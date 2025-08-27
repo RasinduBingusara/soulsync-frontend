@@ -1,18 +1,20 @@
+import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedText } from '@/components/ThemedText';
+import '@/components/translation/i18n';
+import { createUserWithEmailAndPassword, getAuth, updateProfile } from "@react-native-firebase/auth";
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-    SafeAreaView,
-    StyleSheet,
-    View,
-    TouchableOpacity,
+    Alert,
     KeyboardAvoidingView,
     Platform,
-    ScrollView
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import '@/components/translation/i18n';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedInput } from '@/components/ThemedInput';
 
 
 const CreateAccountScreen = () => {
@@ -21,16 +23,46 @@ const CreateAccountScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    // This is a placeholder function for the create account logic
-    const handleCreateAccount = () => {
-        // Add your account creation logic and validation here
-        console.log('Attempting to create account with:', { username, email });
+    const auth = getAuth();
+    
+    const handleCreateAccount = async () => {
         if (password !== confirmPassword) {
-            console.error('Passwords do not match!');
+            Alert.alert(t('common.error'), t('create_account.passwords_do_not_match'));
             return;
         }
 
+        if (!username || !email || !password || !confirmPassword) {
+            Alert.alert(t('common.error'), t('create_account.all_fields_required'));
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await updateProfile(user, { displayName: username });
+
+            console.log("User created successfully:", user.uid);
+            console.log("User's Display Name:", user.displayName);
+
+            Alert.alert(t('create_account.success'), t('create_account.check_your_email'));
+            router.push('/'); 
+
+        } catch (error) {
+            const err = error;
+
+            let errorMessage = t('create_account.registration_failed');
+        
+            Alert.alert(t('common.error'), errorMessage);
+            console.error(error);
+
+        } finally {
+            setLoading(false); 
+        }
     };
 
     return (
