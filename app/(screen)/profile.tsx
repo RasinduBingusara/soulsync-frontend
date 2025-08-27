@@ -1,17 +1,22 @@
+import { getRelativeTime } from '@/components/custom-function/DateTime';
 import { getCurrentUser, SignOut } from '@/components/custom-function/FireBaseFunctions';
+import { IJournalDataResponse, ITask } from '@/components/custom-interface/CustomProps';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import '@/components/translation/i18n';
 import { FontAwesome } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getAuth } from '@react-native-firebase/auth';
+import { getFirestore, collection, query, where, getDocs } from '@react-native-firebase/firestore';
 
 
 // Component to represent a single stat block
-const StatBlock = ({ value, label }:any) => (
+const StatBlock = ({ value, label }: any) => (
     <ThemedView style={styles.statBlock}>
         <ThemedText style={styles.statValue}>{value}</ThemedText>
         <ThemedText style={styles.statLabel}>{label}</ThemedText>
@@ -19,7 +24,7 @@ const StatBlock = ({ value, label }:any) => (
 );
 
 // Component to display a recent journal or task entry
-const EntryItem = ({ icon, iconColor, text, subtext }:any) => (
+const EntryItem = ({ icon, iconColor, text, subtext }: any) => (
     <View style={styles.entryItem}>
         <FontAwesome name={icon} size={16} color={iconColor} style={styles.entryIcon} />
         <ThemedText style={styles.entryText}>{text}</ThemedText>
@@ -28,7 +33,7 @@ const EntryItem = ({ icon, iconColor, text, subtext }:any) => (
 );
 
 // Component to display an emotion item
-const EmotionItem = ({ icon, iconColor, text, percentage }:any) => (
+const EmotionItem = ({ icon, iconColor, text, percentage }: any) => (
     <View style={styles.emotionItem}>
         <View style={styles.emotionInfo}>
             <FontAwesome name={icon} size={16} color={iconColor} style={styles.entryIcon} />
@@ -38,9 +43,98 @@ const EmotionItem = ({ icon, iconColor, text, percentage }:any) => (
     </View>
 );
 
-// Main app component
+
+
 export default function Profile() {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
+    const [recentEntries, setRecentEntries] = useState<IJournalDataResponse[]>([]);
+    const [recentTasks, setRecentTasks] = useState<ITask[]>([]);
+    const [journalCount, setJournalCount] = useState<number>(0);
+    const [taskCount, setTaskCount] = useState<number>(0);
+    const [postCount, setPostCount] = useState<number>(0);
+
+    const db = getFirestore();
+    const user = getAuth().currentUser;
+
+    const getJournalEntries = async () => {
+        const count = 2;
+        try {
+            const jsonValue = await AsyncStorage.getItem('Journals') || '[]';
+
+            // If there's no data, or it's not a valid JSON array, return an empty array.
+            if (jsonValue === null) {
+                console.log("No journal entries found in AsyncStorage.");
+            }
+
+            let entries = JSON.parse(jsonValue);
+            if (user?.uid) {
+                entries = entries.filter((entry: any) => entry.uid === user.uid);
+            }
+            if (Array.isArray(entries)) {
+                setJournalCount(entries.length);
+                setRecentEntries(entries.slice(-count));
+            } else {
+                console.error("Journal entries found, but the data format is invalid (not an array).");
+            }
+
+        } catch (error) {
+            // Handle potential errors during retrieval or parsing.
+            console.error("Error retrieving last journal entry:", error);
+        }
+    };
+
+    const getTasks = async () => {
+        const count = 2;
+        try {
+            const jsonValue = await AsyncStorage.getItem('Tasks') || '[]';
+
+            // If there's no data, or it's not a valid JSON array, return an empty array.
+            if (jsonValue === null) {
+                console.log("No tasks found in AsyncStorage.");
+            }
+
+            let tasks = JSON.parse(jsonValue);
+            if (user?.uid) {
+                tasks = tasks.filter((task: any) => task.uid === user.uid);
+            }
+            if (Array.isArray(tasks)) {
+                setTaskCount(tasks.length);
+                setRecentTasks(tasks.slice(-count));
+            } else {
+                console.error("Tasks found, but the data format is invalid (not an array).");
+            }
+
+        } catch (error) {
+            // Handle potential errors during retrieval or parsing.
+            console.error("Error retrieving last task:", error);
+        }
+    };
+
+    const getPostCount = async () => {
+        if (!db) {
+            console.error("Firestore is not initialized.");
+            return;
+        }
+        try {
+            const uid = user?.uid;
+
+            const q = query(collection(db, "Posts"), where("uid", "==", uid));
+            const querySnapshot = await getDocs(q);
+
+            const count = querySnapshot.size;
+            setPostCount(count);
+            console.log(`Successfully fetched post count for user ${uid}: ${count}`);
+        } catch (error) {
+            console.error("Error getting post count:", error);
+        }
+    };
+
+
+    useEffect(() => {
+        getJournalEntries();
+        getTasks();
+        getPostCount();
+    }, [])
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -65,9 +159,9 @@ export default function Profile() {
 
                     {/* Stats Grid */}
                     <ThemedView style={styles.statsGrid}>
-                        <StatBlock value="14" label={t('profile.journals')} />
-                        <StatBlock value="8" label={t('profile.tasks')} />
-                        <StatBlock value="2" label={t('profile.posts')} />
+                        <StatBlock value={journalCount} label={t('profile.journals')} />
+                        <StatBlock value={taskCount} label={t('profile.tasks')} />
+                        <StatBlock value={postCount} label={t('profile.posts')} />
                     </ThemedView>
 
                     {/* Horizontal Rule */}
@@ -77,23 +171,22 @@ export default function Profile() {
                     <ThemedView style={styles.sectionContainer}>
                         <ThemedView style={styles.sectionHeader}>
                             <ThemedText style={styles.sectionTitle}>{t('profile.recent_journals')}</ThemedText>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => { router.push('/(tabs)/journal-list') }}>
                                 <ThemedText style={styles.viewAllLink}>{t('profile.view_all')}</ThemedText>
                             </TouchableOpacity>
                         </ThemedView>
                         <ThemedView style={styles.listContainer}>
-                            <EntryItem 
-                                icon="book" 
-                                iconColor="#4f46e5" 
-                                text="Feeling great after a productive day." 
-                                subtext="2 days ago" 
-                            />
-                            <EntryItem 
-                                icon="book" 
-                                iconColor="#4f46e5" 
-                                text="I'm a little anxious about tomorrow's meeting." 
-                                subtext="3 days ago" 
-                            />
+
+                            {recentEntries.map((entry, index) => (
+                                <EntryItem
+                                    key={index}
+                                    icon="book"
+                                    iconColor="#4f46e5"
+                                    text={entry.content.length > 30 ? entry.content.substring(0, 30) + '...' : entry.content}
+                                    subtext={getRelativeTime(entry.createAt)}
+                                />
+                            ))}
+
                         </ThemedView>
                     </ThemedView>
 
@@ -101,45 +194,20 @@ export default function Profile() {
                     <ThemedView style={styles.sectionContainer}>
                         <ThemedView style={styles.sectionHeader}>
                             <ThemedText style={styles.sectionTitle}>{t('profile.ongoing_tasks')}</ThemedText>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => { router.push('/(tabs)/task-list') }}>
                                 <ThemedText style={styles.viewAllLink}>{t('profile.view_all')}</ThemedText>
                             </TouchableOpacity>
                         </ThemedView>
                         <ThemedView style={styles.listContainer}>
-                            <EntryItem 
-                                icon="check-square" 
-                                iconColor="#22c55e" 
-                                text="Finish report by Friday" 
-                            />
-                            <EntryItem 
-                                icon="square-o" 
-                                iconColor="#6b7280" 
-                                text="Call a friend for coffee" 
-                            />
-                        </ThemedView>
-                    </ThemedView>
+                            {recentTasks.map((task, index) => (
+                                <EntryItem
+                                    key={index}
+                                    icon="check-square"
+                                    iconColor="#22c55e"
+                                    text={task.title.length > 30 ? task.title.substring(0, 30) + '...' : task.title}
+                                />
+                            ))}
 
-                    {/* Top Emotions Section */}
-                    <ThemedView style={styles.sectionContainer}>
-                        <ThemedView style={styles.sectionHeader}>
-                            <ThemedText style={styles.sectionTitle}>{t('profile.top_emotions')}</ThemedText>
-                            <TouchableOpacity>
-                                <ThemedText style={styles.viewAllLink}>{t('profile.view_history')}</ThemedText>
-                            </TouchableOpacity>
-                        </ThemedView>
-                        <ThemedView style={styles.listContainer}>
-                            <EmotionItem 
-                                icon="smile-o" 
-                                iconColor="#facc15" 
-                                text="Happy" 
-                                percentage="30%" 
-                            />
-                            <EmotionItem 
-                                icon="meh-o" 
-                                iconColor="#3b82f6" 
-                                text="Calm" 
-                                percentage="25%" 
-                            />
                         </ThemedView>
                     </ThemedView>
 
