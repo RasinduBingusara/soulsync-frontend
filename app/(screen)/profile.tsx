@@ -1,27 +1,29 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { getCurrentUser, SignOut } from '@/components/custom-function/FireBaseFunctions';
-import { router } from 'expo-router';
-import { useTranslation } from 'react-i18next';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import '@/components/translation/i18n';
+import { FontAwesome } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 // Component to represent a single stat block
 const StatBlock = ({ value, label }:any) => (
-    <View style={styles.statBlock}>
-        <Text style={styles.statValue}>{value}</Text>
-        <Text style={styles.statLabel}>{label}</Text>
-    </View>
+    <ThemedView style={styles.statBlock}>
+        <ThemedText style={styles.statValue}>{value}</ThemedText>
+        <ThemedText style={styles.statLabel}>{label}</ThemedText>
+    </ThemedView>
 );
 
 // Component to display a recent journal or task entry
 const EntryItem = ({ icon, iconColor, text, subtext }:any) => (
     <View style={styles.entryItem}>
         <FontAwesome name={icon} size={16} color={iconColor} style={styles.entryIcon} />
-        <Text style={styles.entryText}>{text}</Text>
-        {subtext && <Text style={styles.entrySubtext}>{subtext}</Text>}
+        <ThemedText style={styles.entryText}>{text}</ThemedText>
+        {subtext && <ThemedText style={styles.entrySubtext}>{subtext}</ThemedText>}
     </View>
 );
 
@@ -30,9 +32,9 @@ const EmotionItem = ({ icon, iconColor, text, percentage }:any) => (
     <View style={styles.emotionItem}>
         <View style={styles.emotionInfo}>
             <FontAwesome name={icon} size={16} color={iconColor} style={styles.entryIcon} />
-            <Text style={styles.emotionText}>{text}</Text>
+            <ThemedText style={styles.emotionText}>{text}</ThemedText>
         </View>
-        <Text style={styles.emotionPercentage}>{percentage}</Text>
+        <ThemedText style={styles.emotionPercentage}>{percentage}</ThemedText>
     </View>
 );
 
@@ -44,42 +46,42 @@ export default function Profile() {
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 {/* Header Section */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>{t('profile.title')}</Text>
+                    <ThemedText style={styles.headerTitle}>{t('profile.title')}</ThemedText>
                 </View>
 
                 {/* Profile Card */}
-                <View style={styles.mainCard}>
+                <ThemedView style={styles.mainCard}>
 
                     {/* Profile Image */}
-                    <View style={styles.profileImageContainer}>
+                    <ThemedView style={styles.profileImageContainer}>
                         <FontAwesome name="user-circle" size={100} color="#4f46e5" />
-                    </View>
+                    </ThemedView>
 
                     {/* User Info */}
-                    <View style={styles.userInfo}>
-                        <Text style={styles.userName}>{getCurrentUser()?.displayName}</Text>
-                        <Text style={styles.userEmail}>{getCurrentUser()?.email}</Text>
-                    </View>
+                    <ThemedView style={styles.userInfo}>
+                        <ThemedText style={styles.userName}>{getCurrentUser()?.displayName}</ThemedText>
+                        <ThemedText style={styles.userEmail}>{getCurrentUser()?.email}</ThemedText>
+                    </ThemedView>
 
                     {/* Stats Grid */}
-                    <View style={styles.statsGrid}>
+                    <ThemedView style={styles.statsGrid}>
                         <StatBlock value="14" label={t('profile.journals')} />
                         <StatBlock value="8" label={t('profile.tasks')} />
                         <StatBlock value="2" label={t('profile.posts')} />
-                    </View>
-                    
+                    </ThemedView>
+
                     {/* Horizontal Rule */}
-                    <View style={styles.divider} />
-                    
+                    <ThemedView style={styles.divider} />
+
                     {/* Recent Journals Section */}
-                    <View style={styles.sectionContainer}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>{t('profile.recent_journals')}</Text>
+                    <ThemedView style={styles.sectionContainer}>
+                        <ThemedView style={styles.sectionHeader}>
+                            <ThemedText style={styles.sectionTitle}>{t('profile.recent_journals')}</ThemedText>
                             <TouchableOpacity>
-                                <Text style={styles.viewAllLink}>{t('profile.view_all')}</Text>
+                                <ThemedText style={styles.viewAllLink}>{t('profile.view_all')}</ThemedText>
                             </TouchableOpacity>
-                        </View>
-                        <View style={styles.listContainer}>
+                        </ThemedView>
+                        <ThemedView style={styles.listContainer}>
                             <EntryItem 
                                 icon="book" 
                                 iconColor="#4f46e5" 
@@ -92,18 +94,18 @@ export default function Profile() {
                                 text="I'm a little anxious about tomorrow's meeting." 
                                 subtext="3 days ago" 
                             />
-                        </View>
-                    </View>
-                    
+                        </ThemedView>
+                    </ThemedView>
+
                     {/* Ongoing Tasks Section */}
-                    <View style={styles.sectionContainer}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>{t('profile.ongoing_tasks')}</Text>
+                    <ThemedView style={styles.sectionContainer}>
+                        <ThemedView style={styles.sectionHeader}>
+                            <ThemedText style={styles.sectionTitle}>{t('profile.ongoing_tasks')}</ThemedText>
                             <TouchableOpacity>
-                                <Text style={styles.viewAllLink}>{t('profile.view_all')}</Text>
+                                <ThemedText style={styles.viewAllLink}>{t('profile.view_all')}</ThemedText>
                             </TouchableOpacity>
-                        </View>
-                        <View style={styles.listContainer}>
+                        </ThemedView>
+                        <ThemedView style={styles.listContainer}>
                             <EntryItem 
                                 icon="check-square" 
                                 iconColor="#22c55e" 
@@ -114,18 +116,18 @@ export default function Profile() {
                                 iconColor="#6b7280" 
                                 text="Call a friend for coffee" 
                             />
-                        </View>
-                    </View>
-                    
+                        </ThemedView>
+                    </ThemedView>
+
                     {/* Top Emotions Section */}
-                    <View style={styles.sectionContainer}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>{t('profile.top_emotions')}</Text>
+                    <ThemedView style={styles.sectionContainer}>
+                        <ThemedView style={styles.sectionHeader}>
+                            <ThemedText style={styles.sectionTitle}>{t('profile.top_emotions')}</ThemedText>
                             <TouchableOpacity>
-                                <Text style={styles.viewAllLink}>{t('profile.view_history')}</Text>
+                                <ThemedText style={styles.viewAllLink}>{t('profile.view_history')}</ThemedText>
                             </TouchableOpacity>
-                        </View>
-                        <View style={styles.listContainer}>
+                        </ThemedView>
+                        <ThemedView style={styles.listContainer}>
                             <EmotionItem 
                                 icon="smile-o" 
                                 iconColor="#facc15" 
@@ -138,22 +140,22 @@ export default function Profile() {
                                 text="Calm" 
                                 percentage="25%" 
                             />
-                        </View>
-                    </View>
+                        </ThemedView>
+                    </ThemedView>
 
                     {/* Profile Actions */}
-                    <View style={styles.actionsContainer}>
+                    <ThemedView style={styles.actionsContainer}>
                         <TouchableOpacity style={styles.actionButton} onPress={() => { router.push('/(screen)/settings') }}>
                             <FontAwesome name="cog" size={18} color="#4b5563" style={styles.actionIcon} />
-                            <Text style={styles.actionText}>{t('profile.settings')}</Text>
+                            <ThemedText style={styles.actionText}>{t('profile.settings')}</ThemedText>
                         </TouchableOpacity>
                         <TouchableOpacity style={[styles.actionButton, styles.logoutButton]} onPress={() => { SignOut() }}>
                             <FontAwesome name="sign-out" size={18} color="white" style={styles.actionIcon} />
-                            <Text style={styles.logoutText}>{t('profile.logout')}</Text>
+                            <ThemedText style={styles.logoutText}>{t('profile.logout')}</ThemedText>
                         </TouchableOpacity>
-                    </View>
+                    </ThemedView>
 
-                </View>
+                </ThemedView>
             </ScrollView>
         </SafeAreaView>
     );
@@ -162,7 +164,6 @@ export default function Profile() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
     },
     scrollViewContainer: {
         alignItems: 'center',
@@ -299,7 +300,8 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     actionButton: {
-        backgroundColor: '#f3f4f6',
+        borderColor: '#737373ff',
+        borderWidth: 1,
         borderRadius: 12,
         paddingVertical: 12,
         flexDirection: 'row',

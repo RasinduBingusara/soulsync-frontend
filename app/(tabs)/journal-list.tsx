@@ -9,6 +9,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from "@react-native-firebase/auth"
 import { useTranslation } from 'react-i18next';
 import '@/components/translation/i18n';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function JournalList() {
   const { t } = useTranslation();
@@ -97,10 +100,10 @@ export default function JournalList() {
 
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>{t('journal_list.title')}</Text>
-      </View>
+    <ThemedSafeAreaView style={styles.safeArea}>
+      <ThemedView style={styles.headerContainer}>
+        <ThemedText style={styles.headerTitle}>{t('journal_list.title')}</ThemedText>
+      </ThemedView>
       {displayedJournals.length > 0 ? (
         <FlatList
           data={displayedJournals}
@@ -132,14 +135,13 @@ export default function JournalList() {
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/journal_create') }}>
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
     paddingHorizontal: 10
   },
   scrollView: {

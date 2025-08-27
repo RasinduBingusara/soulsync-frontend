@@ -1,9 +1,12 @@
 import { getAuth } from '@react-native-firebase/auth';
 import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, setDoc } from '@react-native-firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Button, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { PostProps } from './custom-interface/CustomProps';
+import { ThemedView } from './ThemedView';
+import { ThemedText } from './ThemedText';
+import { ThemedInput } from './ThemedInput';
 
 interface Comment {
   id: string;
@@ -13,7 +16,7 @@ interface Comment {
   timestamp: Date;
 }
 
-const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostProps) => {
+const Post = ({ id, content, mood, uid, email, isAnonymouse, profileName }: PostProps) => {
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -21,7 +24,7 @@ const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostPr
   const [comments, setComments] = useState<Comment[]>([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const db = getFirestore();
   const user = getAuth().currentUser;
@@ -46,7 +49,7 @@ const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostPr
 
     const commentsRef = collection(db, 'Posts', id, 'comments');
     const commentsUnsubscribe = onSnapshot(commentsRef, (querySnapshot) => {
-      const fetchedComments = querySnapshot.docs.map((doc:any) => ({
+      const fetchedComments = querySnapshot.docs.map((doc: any) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate(), // Convert Firestore Timestamp to Date object
@@ -70,7 +73,7 @@ const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostPr
   const handleLike = async () => {
     if (!user || !id) return;
     const likeRef = doc(db, `Posts/${id}/likes`, user.uid);
-    
+
     try {
       if (isLiked) {
         // Unlike the post
@@ -108,59 +111,59 @@ const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostPr
     }
   };
 
-  const renderCommentItem = ({ item }:any) => (
-    <View style={styles.commentItem}>
-      <Text style={styles.commentUser}>{item.userName || 'Anonymous'}</Text>
-      <Text style={styles.commentText}>{item.comment}</Text>
-    </View>
+  const renderCommentItem = ({ item }: any) => (
+    <ThemedView style={styles.commentItem}>
+      <ThemedText style={styles.commentUser}>{item.userName || 'Anonymous'}</ThemedText>
+      <ThemedText style={styles.commentText}>{item.comment}</ThemedText>
+    </ThemedView>
   );
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container} darkColor='#292929ff'>
       {/* Header Section */}
-      <View style={styles.header}>
-        <View style={styles.profileContainer}>
-          <Text style={styles.profileName}>
+      <ThemedView style={styles.header} darkColor='#292929ff'>
+        <ThemedView style={styles.profileContainer} darkColor='#292929ff'>
+          <ThemedText style={styles.profileName}>
             {isAnonymouse ? 'Anonymouse' : profileName}
-          </Text>
-        </View>
+          </ThemedText>
+        </ThemedView>
         <TouchableOpacity>
           <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" />
         </TouchableOpacity>
-      </View>
+      </ThemedView>
 
-      <Text style={styles.description}>{content}</Text>
-      <Text style={{fontStyle: 'italic', color: '#6b7280', marginBottom: 10}}>Mood: {mood}</Text>
+      <ThemedText style={styles.description}>{content}</ThemedText>
+      <ThemedText style={{ fontStyle: 'italic', color: '#6b7280', marginBottom: 10 }}>Mood: {mood}</ThemedText>
 
       {/* Action Buttons */}
-      <View style={styles.actionsContainer}>
+      <ThemedView style={styles.actionsContainer} darkColor='#292929ff'>
         <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-          <Text style={[styles.actionText, isLiked && styles.likedActionText]}>
+          <ThemedText style={[styles.actionText, isLiked && styles.likedActionText]}>
             {isLiked ? '♥ Liked' : '♡ Like'} ({likesCount})
-          </Text>
+          </ThemedText>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={() => { setIsModalVisible(true) }}>
-          <Text style={styles.actionText}>
+          <ThemedText style={styles.actionText}>
             Comment ({commentsCount})
-          </Text>
+          </ThemedText>
         </TouchableOpacity>
-      </View>
+      </ThemedView>
 
       <Modal
         animationType="slide"
         transparent={true}
         visible={isModalVisible}
-        onRequestClose={() => {setIsModalVisible(false)}}
+        onRequestClose={() => { setIsModalVisible(false) }}
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.modalOverlay}
         >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.headerTitle}>Comments</Text>
-              <Button title="Close" onPress={() => {setIsModalVisible(false)}} />
-            </View>
+          <ThemedView style={styles.modalContent}>
+            <ThemedView style={styles.modalHeader}>
+              <ThemedText style={styles.headerTitle}>Comments</ThemedText>
+              <Button title="Close" onPress={() => { setIsModalVisible(false) }} />
+            </ThemedView>
 
             <FlatList
               data={comments}
@@ -170,8 +173,8 @@ const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostPr
               inverted
             />
 
-            <View style={styles.commentInputContainer}>
-              <TextInput
+            <ThemedView style={styles.commentInputContainer}>
+              <ThemedInput
                 style={styles.commentInput}
                 placeholder="Add a comment..."
                 value={commentText}
@@ -179,19 +182,19 @@ const Post = ({ id, content,mood, uid, email, isAnonymouse, profileName}: PostPr
                 onSubmitEditing={handleComment}
               />
               {
-                loading? (
-                  <ActivityIndicator size={'small'}/>
-                ):
-                (
-                  <Button title="Post" onPress={handleComment} disabled={!commentText.trim()} />
-                )
+                loading ? (
+                  <ActivityIndicator size={'small'} />
+                ) :
+                  (
+                    <Button title="Post" onPress={handleComment} disabled={!commentText.trim()} />
+                  )
               }
-              
-            </View>
-          </View>
+
+            </ThemedView>
+          </ThemedView>
         </KeyboardAvoidingView>
       </Modal>
-    </View>
+    </ThemedView>
   );
 };
 

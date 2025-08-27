@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/ThemedText'
 import { ThemedTouchableOpacity } from '@/components/ThemedTouchableOpacity'
 import { ThemedView } from '@/components/ThemedView'
 import { useEffect, useState } from 'react'
-import { Button, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Button, Modal, ScrollView, StyleSheet,Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth, { getAuth } from "@react-native-firebase/auth"
@@ -17,8 +17,6 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 import { FontAwesome } from '@expo/vector-icons'
 import { saveDailyMood } from '@/components/custom-function/FireBaseFunctions'
 import { ActionSuggest } from '@/components/custom-function/SuggestionProvider'
-import { useTranslation } from 'react-i18next';
-import '@/components/translation/i18n';
 
 interface IfeatureBlock {
   title: string
@@ -39,19 +37,19 @@ const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress, 
       {isMain ? (
         <View style={styles.mainBlockContent}>
           <View>
-            <FontAwesome name={iconName} size={24} color="white" />
             <Text style={styles.mainBlockTitle}>{title}</Text>
             <Text style={styles.mainBlockSubtitle}>{subtitle}</Text>
             {suggestion !== '' && (
-                <Text style={{ color: 'white', fontSize: 12 }}>AI Suggestion: {suggestion}</Text>
+                <Text style={{ color: 'white', fontSize: 12 }}>{suggestion}</Text>
             )}
 
           </View>
+          <FontAwesome name={iconName} size={24} color="white" />
         </View>
       ) : (
         <View style={styles.interactiveBlockContent}>
           <FontAwesome name={iconName} size={32} color="#4f46e5" />
-          <Text style={styles.interactiveBlockTitle}>{title}</Text>
+          <ThemedText style={styles.interactiveBlockTitle}>{title}</ThemedText>
         </View>
       )}
     </TouchableOpacity>
@@ -59,10 +57,9 @@ const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress, 
 };
 
 function HomeScreen() {
-  const { t } = useTranslation();
 
   const [userName, setUserName] = useState('Beebyte')
-  const [emotionSummary, setEmotionSummary] = useState(t('home.how_are_you'))
+  const [emotionSummary, setEmotionSummary] = useState('How are you feeling right now?')
   const [suggestedAction, setSuggestedAction] = useState('')
   const [isPopUpVisible, setIsPopUpVisible] = useState(false);
   const [aboutToday, setAboutToday] = useState('')
@@ -136,26 +133,26 @@ function HomeScreen() {
   }, [auth]);
 
   return (
-    <SafeAreaView style={{ backgroundColor: '#ffffff' }}>
+    <SafeAreaView>
       <ScrollView style={styles.scrollView}>
         {/* Header Section */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>{t('home.greeting', { name: userName })}</Text>
+          <ThemedText style={styles.greeting}>Hello, {userName}!</ThemedText>
           <View style={styles.headerIcons}>
             <TouchableOpacity style={styles.iconButton} onPress={() => { router.push('/(screen)/profile') }}>
-              <FontAwesome name="user-circle" size={28} color="#6b7280" />
+              <FontAwesome name="user-circle" size={28} color="#8a8a8aff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton} onPress={() => { router.push('/(screen)/settings') }}>
-              <FontAwesome name="cog" size={28} color="#6b7280" />
+              <FontAwesome name="cog" size={28} color="#8a8a8aff" />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Main Content Card */}
-        <View style={styles.mainCard}>
+        <ThemedView style={styles.mainCard}>
           {/* Daily Check-in */}
           <InteractiveBlock
-            title={t('home.checkin_today')}
+            title="Check-in Today"
             subtitle={emotionSummary}
             iconName="edit"
             isMain={true}
@@ -164,15 +161,15 @@ function HomeScreen() {
           />
 
           {/* Grid for other features */}
-          <View style={styles.gridContainer}>
-            <InteractiveBlock title={t('home.chatbot')} iconName="comments" onPress={() => { router.push('/(screen)/chat_bot') }} />
-            <InteractiveBlock title={t('home.dashboard')} iconName="pie-chart" onPress={() => { router.push('/(screen)/dashboard') }} />
-            <InteractiveBlock title={t('home.journal')} iconName="book" onPress={() => { router.push('/(screen)/journal_create') }} />
-            <InteractiveBlock title={t('home.tasks')} iconName="tasks" onPress={() => { router.push('/(screen)/task_create') }} />
-            <InteractiveBlock title={t('home.community')} iconName="commenting" onPress={() => { router.push('/(screen)/post_create') }} />
-            <InteractiveBlock title={t('home.learning_zone')} iconName="graduation-cap" />
-          </View>
-        </View>
+          <ThemedView style={styles.gridContainer}>
+            <InteractiveBlock title="Chatbot" iconName="comments" onPress={() => { router.push('/(screen)/chat_bot') }} />
+            <InteractiveBlock title="Dashboard" iconName="pie-chart" onPress={() => { router.push('/(screen)/dashboard') }} />
+            <InteractiveBlock title="Journal" iconName="book" onPress={() => { router.push('/(screen)/journal_create') }} />
+            <InteractiveBlock title="Tasks" iconName="tasks" onPress={() => { router.push('/(screen)/task_create') }} />
+            <InteractiveBlock title="Community" iconName="commenting" onPress={() => { router.push('/(screen)/post_create') }} />
+            <InteractiveBlock title="Learning Zone" iconName="graduation-cap" />
+          </ThemedView>
+        </ThemedView>
       </ScrollView>
 
       <Modal
@@ -194,17 +191,17 @@ function HomeScreen() {
               <Text style={styles.closeButtonText}>✕</Text>
             </TouchableOpacity>
 
-            <Text style={styles.modalHeader}>{t('home.how_about_your_day')}</Text>
+            <Text style={styles.modalHeader}>How about your day?</Text>
             <ScrollView style={styles.messageScrollView}>
               <CustomTextInput
                 type='area'
-                label={t('home.tell_us_about_your_day')}
-                placeholder={t('home.enter_message_placeholder')}
+                label="Tell us about your day"
+                placeholder="Enter your message here..."
                 value={aboutToday}
                 setValue={(value) => setAboutToday(value)}
               />
               <CustomButton
-                text={t('home.submit')}
+                text='Submit'
                 pressable={aboutToday.length > 0 ? true : false}
                 fontSize={16}
                 onPress={() => {
@@ -284,7 +281,8 @@ const styles = StyleSheet.create({
     rowGap: 16,
   },
   interactiveBlock: {
-    backgroundColor: '#f3f4f6',
+    borderColor: '#838383ff',
+    borderWidth: 1,
     borderRadius: 16,
     padding: 24,
     width: '48%', // Approx. 2 columns with a small gap

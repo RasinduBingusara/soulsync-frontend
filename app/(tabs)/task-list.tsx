@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, RefreshControl, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, ScrollView, RefreshControl, TouchableOpacity, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -11,6 +11,9 @@ import { ITask } from '@/components/custom-interface/CustomProps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import '@/components/translation/i18n';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
 
 export default function TaskList() {
     const { t } = useTranslation();
@@ -86,7 +89,7 @@ export default function TaskList() {
     }
 
     const renderTaskItem = ({ item }: { item: ITask }) => (
-        <View style={styles.taskItem}>
+        <ThemedView style={styles.taskItem}>
             <TaskItem
                 key={item.id}
                 task={item}
@@ -94,7 +97,7 @@ export default function TaskList() {
                 onRemoveTask={() => { deleteTask(item.id) }}
             />
 
-        </View>
+        </ThemedView>
     );
 
     const onRefresh = useCallback(async () => {
@@ -113,13 +116,13 @@ export default function TaskList() {
     }, []);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
+        <ThemedSafeAreaView style={styles.safeArea}>
+            <ThemedView style={styles.container}>
 
                 {/* Header Section */}
-                <View style={styles.headerContainer}>
-                    <Text style={styles.headerTitle}>{t('task_list.title')}</Text>
-                </View>
+                <ThemedView style={styles.headerContainer}>
+                    <ThemedText style={styles.headerTitle}>{t('task_list.title')}</ThemedText>
+                </ThemedView>
 
                 <FlatList
                     data={latestTasks}
@@ -134,19 +137,18 @@ export default function TaskList() {
                     contentContainerStyle={styles.entriesList}
                 />
 
-            </View>
+            </ThemedView>
 
             <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/task_create') }}>
                 <FontAwesome name="plus" size={24} color="white" />
             </TouchableOpacity>
-        </SafeAreaView>
+        </ThemedSafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
     },
     container: {
         flex: 1,

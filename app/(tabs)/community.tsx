@@ -12,6 +12,8 @@ import { PostProps } from '@/components/custom-interface/CustomProps';
 
 import { useTranslation } from 'react-i18next';
 import '@/components/translation/i18n';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedView } from '@/components/ThemedView';
 
 function community() {
   const { t } = useTranslation();
@@ -66,10 +68,10 @@ function community() {
   }, [])
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>{t('community_list.title')}</Text>
-      </View>
+    <ThemedSafeAreaView style={styles.safeArea}>
+      <ThemedView style={styles.headerContainer}>
+        <ThemedText style={styles.headerTitle}>{t('community_list.title')}</ThemedText>
+      </ThemedView>
 
       {posts[0] ? (
         <FlatList
@@ -104,14 +106,13 @@ function community() {
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/post_create') }}>
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
     paddingHorizontal: 10
   },
   scrollView: {
@@ -131,7 +132,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#374151',
   },
   addButton: {
     flexDirection: 'row',

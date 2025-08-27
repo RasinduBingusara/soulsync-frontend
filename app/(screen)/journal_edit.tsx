@@ -1,14 +1,17 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { router,useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 
-import { JournalEntry } from '@/components/JournalEntry';
-import { getAuth } from "@react-native-firebase/auth";
-import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where,doc, updateDoc } from '@react-native-firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PredictMood } from '@/components/custom-function/MoodPredictor';
+import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedLabel } from '@/components/ThemedLabel';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth } from "@react-native-firebase/auth";
+import { getFirestore } from '@react-native-firebase/firestore';
 
 
 
@@ -111,24 +114,24 @@ export default function JournalEdit() {
 
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <ThemedSafeAreaView style={styles.safeArea}>
 
-            <View style={styles.headerContainer}>
+            <ThemedView style={styles.headerContainer}>
                 <TouchableOpacity style={styles.backButton} onPress={() => { router.push('..') }}>
                     <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Update Daily Journal</Text>
-            </View>
+                <ThemedText style={styles.headerTitle}>Update Daily Journal</ThemedText>
+            </ThemedView>
 
-            <View style={styles.contentContainer}>
+            <ThemedView style={styles.contentContainer}>
 
-                <View style={styles.formSection}>
-                    <Text style={styles.formTitle}>How are you feeling now?</Text>
+                <ThemedView style={styles.formSection}>
+                    <ThemedText style={styles.formTitle}>How are you feeling now?</ThemedText>
 
                     {/* The Write Your Entry Section */}
-                    <View style={styles.inputGroupContainer}>
-                        <Text style={styles.inputLabel}>Rewrite your entry</Text>
-                        <TextInput
+                    <ThemedView style={styles.inputGroupContainer}>
+                        <ThemedLabel style={styles.inputLabel}>Rewrite your entry</ThemedLabel>
+                        <ThemedInput
                             style={styles.textArea}
                             placeholder="Share your thoughts..."
                             placeholderTextColor="#9ca3af"
@@ -138,42 +141,41 @@ export default function JournalEdit() {
                             value={updatedContent}
                             onChangeText={(value) => setUpdatedContent(value)}
                         />
-                    </View>
+                    </ThemedView>
 
                     {/* The Emotion Section */}
-                    <View style={styles.inputGroupContainer}>
-                        <Text style={styles.inputLabel}>Emotion</Text>
-                        <TextInput
+                    <ThemedView style={styles.inputGroupContainer}>
+                        <ThemedLabel style={styles.inputLabel}>Emotion</ThemedLabel>
+                        <ThemedInput
                             style={styles.textInput}
                             placeholder="..."
                             placeholderTextColor="#9ca3af"
                             editable={false}
                             value={updatedmood}
                         />
-                    </View>
+                    </ThemedView>
                     {
                         loading ? (
                             <ActivityIndicator size={'small'} />
                         ) :
                             (
                                 <TouchableOpacity style={styles.saveButton} onPress={updateJournal}>
-                                    <Text style={styles.saveButtonText}>Update Entry</Text>
+                                    <ThemedText style={styles.saveButtonText}>Update Entry</ThemedText>
                                 </TouchableOpacity>
                             )
                     }
 
-                </View>
-            </View>
+                </ThemedView>
+            </ThemedView>
 
 
-        </SafeAreaView>
+        </ThemedSafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
     },
     contentContainer: {
         paddingHorizontal: 16,
@@ -226,7 +228,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 8,
         fontSize: 14,
-        color: '#1f2937',
     },
     textArea: {
         height: 200,
@@ -236,7 +237,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 12,
         fontSize: 14,
-        color: '#1f2937',
     },
     formTitle: {
         fontSize: 18,

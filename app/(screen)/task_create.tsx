@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'; // Used for icons
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -11,6 +11,11 @@ import { PredictSuggestion } from '@/components/custom-function/SuggestionProvid
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import '@/components/translation/i18n';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedLabel } from '@/components/ThemedLabel';
 
 interface ICheckBox {
   text: string,
@@ -115,32 +120,32 @@ export default function TaskCreate() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <ThemedSafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.scrollView}>
 
-        <View style={styles.headerContainer}>
+        <ThemedView style={styles.headerContainer}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.push('..')}>
             <FontAwesome name="arrow-left" size={24} color="#6b7280" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('task.create_new_task')}</Text>
-        </View>
+          <ThemedText style={styles.headerTitle}>{t('task.create_new_task')}</ThemedText>
+        </ThemedView>
 
-        <View style={styles.formSection}>
+        <ThemedView style={styles.formSection}>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>{t('task.task_title')}</Text>
-            <TextInput
+          <ThemedView style={styles.inputGroup}>
+            <ThemedLabel style={styles.inputLabel}>{t('task.task_title')}</ThemedLabel>
+            <ThemedInput
               style={styles.textInput}
               placeholder={t('task.finish_project_report')}
               placeholderTextColor="#9ca3af"
               onChangeText={setTaskTitle}
               value={taskTitle}
             />
-          </View>
+          </ThemedView>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>{t('task.description')}</Text>
-            <TextInput
+          <ThemedView style={styles.inputGroup}>
+            <ThemedLabel style={styles.inputLabel}>{t('task.description')}</ThemedLabel>
+            <ThemedInput
               style={styles.textArea}
               placeholder={t('task.add_more_details')}
               placeholderTextColor="#9ca3af"
@@ -150,30 +155,30 @@ export default function TaskCreate() {
               onChangeText={setTaskContent}
               value={taskContent}
             />
-          </View>
+          </ThemedView>
 
           {/* Sub tasks */}
-          <View style={styles.checklistSection}>
-            <Text style={styles.checklistTitle}>{t('task.subtasks_checklist')}</Text>
-            <View style={styles.checklistContainer}>
+          <ThemedView style={styles.checklistSection}>
+            <ThemedText style={styles.checklistTitle}>{t('task.subtasks_checklist')}</ThemedText>
+            <ThemedView style={styles.checklistContainer}>
 
               {checklist.map((item, index) => (
-                <View key={index} style={styles.checklistItem}>
-                  <View style={styles.checkitem}>
+                <ThemedView key={index} style={styles.checklistItem}>
+                  <ThemedView style={styles.checkitem}>
                     <TouchableOpacity style={styles.checkbox} onPress={() => { toggleSubTask(index) }}>
                       {item.completed && (<FontAwesome name="check" size={10} color="green" />)}
                     </TouchableOpacity>
-                    <Text style={[styles.checklistText, item.completed && ({ textDecorationLine: 'line-through' })]}>{item.text}</Text>
-                  </View>
+                    <ThemedText style={[styles.checklistText, item.completed && ({ textDecorationLine: 'line-through' })]}>{item.text}</ThemedText>
+                  </ThemedView>
                   <TouchableOpacity style={[styles.addButton, { backgroundColor: '#e54646ff', width: 30, height: 30 }]} onPress={() => removeSubTask(index)}>
                     <FontAwesome name="minus" size={10} color="white" />
                   </TouchableOpacity>
-                </View>
+                </ThemedView>
               ))}
 
-            </View>
-            <View style={styles.addChecklistContainer}>
-              <TextInput
+            </ThemedView>
+            <ThemedView style={styles.addChecklistContainer}>
+              <ThemedInput
                 style={styles.subTaskInput}
                 placeholder={t('task.add_subtask')}
                 placeholderTextColor="#9ca3af"
@@ -183,53 +188,53 @@ export default function TaskCreate() {
               <TouchableOpacity style={[styles.addButton, { backgroundColor: '#4b46e5ff' }]} onPress={addSubTask}>
                 <FontAwesome name="plus" size={16} color="white" />
               </TouchableOpacity>
-            </View>
-          </View>
+            </ThemedView>
+          </ThemedView>
 
-          <View style={styles.gridContainer}>
-            <View style={styles.relativeInput}>
-              <Text style={styles.inputLabel}>{t('task.due_date')}</Text>
-              <TextInput
+          <ThemedView style={styles.gridContainer}>
+            <ThemedView style={styles.relativeInput}>
+              <ThemedLabel style={styles.inputLabel}>{t('task.due_date')}</ThemedLabel>
+              <ThemedInput
                 style={styles.textInput}
                 placeholder="YYYY-MM-DD"
                 placeholderTextColor="#9ca3af"
                 value={dateTime.toLocaleDateString()}
                 onPress={() => setdatetimeOpen(true)}
               />
-            </View>
-            <View style={styles.relativeInput}>
-              <Text style={styles.inputLabel}>{t('task.due_time')}</Text>
-              <TextInput
+            </ThemedView>
+            <ThemedView style={styles.relativeInput}>
+              <ThemedLabel style={styles.inputLabel}>{t('task.due_time')}</ThemedLabel>
+              <ThemedInput
                 style={styles.textInput}
                 placeholder="HH:MM"
                 placeholderTextColor="#9ca3af"
                 value={dateTime.toLocaleTimeString()}
                 onPress={() => setdatetimeOpen(true)}
               />
-            </View>
-            <View style={styles.priorityList}>
-              <Text style={styles.inputLabel}>{t('task.priority')}</Text>
+            </ThemedView>
+            <ThemedView style={styles.priorityList}>
+              <ThemedLabel style={styles.inputLabel}>{t('task.priority')}</ThemedLabel>
               <TouchableOpacity style={[styles.priorityButton, { backgroundColor: '#9e9e9eff' }]} onPress={() => { setPriority('low') }}>
-                <Text style={styles.createButtonText}>{t('task.low')}</Text>
+                <ThemedText style={styles.createButtonText}>{t('task.low')}</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.priorityButton, { backgroundColor: '#1264deff' }]} onPress={() => { setPriority('medium') }}>
-                <Text style={styles.createButtonText}>{t('task.medium')}</Text>
+                <ThemedText style={styles.createButtonText}>{t('task.medium')}</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.priorityButton, { backgroundColor: '#e54646ff' }]} onPress={() => { setPriority('high') }}>
-                <Text style={styles.createButtonText}>{t('task.high')}</Text>
+                <ThemedText style={styles.createButtonText}>{t('task.high')}</ThemedText>
               </TouchableOpacity>
-            </View>
-          </View>
+            </ThemedView>
+          </ThemedView>
 
           {
-            loading || isPredicting ? <Text style={{ textAlign: 'center', marginBottom: 10, color: '#6b7280' }}>{t('task.creating_task')}</Text> : (
+            loading || isPredicting ? <ThemedText style={{ textAlign: 'center', marginBottom: 10, color: '#6b7280' }}>{t('task.creating_task')}</ThemedText> : (
               <TouchableOpacity style={styles.createButton} onPress={() => createTask(checklist)}>
-                <Text style={styles.createButtonText}>{t('task.create_task')}</Text>
+                <ThemedText style={styles.createButtonText}>{t('task.create_task')}</ThemedText>
               </TouchableOpacity>
             )
           }
 
-        </View>
+        </ThemedView>
 
         <DatePicker
           modal
@@ -245,14 +250,13 @@ export default function TaskCreate() {
         />
 
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
   },
   scrollView: {
     flex: 1,
@@ -289,11 +293,9 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 12,
-    color: '#6b7280',
     position: 'absolute',
     top: -8,
     left: 12,
-    backgroundColor: 'white',
     paddingHorizontal: 4,
     zIndex: 1,
   },
@@ -304,7 +306,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 14,
-    color: '#1f2937',
   },
   textArea: {
     height: 120,
@@ -314,7 +315,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     fontSize: 14,
-    color: '#1f2937',
   },
   checklistSection: {
     marginBottom: 24,
@@ -350,7 +350,6 @@ const styles = StyleSheet.create({
   },
   checklistText: {
     fontSize: 14,
-    color: '#374151',
   },
   addChecklistContainer: {
     flexDirection: 'row',
@@ -365,7 +364,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     fontSize: 14,
-    color: '#1f2937',
   },
   addButton: {
     width: 48,

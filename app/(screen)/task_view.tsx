@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams } from 'expo-router';
+import { getDate, getTime } from '@/components/custom-function/DateTime';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getDate, getTime } from '@/components/custom-function/DateTime';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 // Define the type for a single sub-task item
 interface ICheckBox {
@@ -85,77 +87,77 @@ export default function TaskViewScreen() {
     const formattedTime = getTime(task.dateTime);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <ThemedSafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.scrollView}>
 
-                <View style={styles.headerContainer}>
+                <ThemedView style={styles.headerContainer}>
                     <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
                         <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Task Details</Text>
-                </View>
+                    <ThemedText style={styles.headerTitle}>Task Details</ThemedText>
+                </ThemedView>
 
-                <View style={styles.contentContainer}>
+                <ThemedView style={styles.contentContainer}>
 
                     {/* Task Title */}
-                    <Text style={styles.taskTitle}>{task.title}</Text>
+                    <ThemedText style={styles.taskTitle}>{task.title}</ThemedText>
 
                     {/* Priority, Date, and Time */}
-                    <View style={styles.detailsGrid}>
-                        <View style={styles.detailItem}>
-                            <Text style={styles.detailLabel}>Priority</Text>
-                            <View style={[styles.priorityBadge, getPriorityStyle(task.priority)]}>
-                                <Text style={styles.priorityText}>{task.priority}</Text>
-                            </View>
-                        </View>
-                        <View style={styles.detailItem}>
-                            <Text style={styles.detailLabel}>Due Date</Text>
-                            <Text style={styles.detailValue}>{formattedDate}</Text>
-                        </View>
-                        <View style={styles.detailItem}>
-                            <Text style={styles.detailLabel}>Due Time</Text>
-                            <Text style={styles.detailValue}>{formattedTime}</Text>
-                        </View>
-                    </View>
+                    <ThemedView style={styles.detailsGrid}>
+                        <ThemedView style={styles.detailItem}>
+                            <ThemedText style={styles.detailLabel}>Priority</ThemedText>
+                            <ThemedView style={[styles.priorityBadge, getPriorityStyle(task.priority)]}>
+                                <ThemedText style={styles.priorityText}>{task.priority}</ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                        <ThemedView style={styles.detailItem}>
+                            <ThemedText style={styles.detailLabel}>Due Date</ThemedText>
+                            <ThemedText style={styles.detailValue}>{formattedDate}</ThemedText>
+                        </ThemedView>
+                        <ThemedView style={styles.detailItem}>
+                            <ThemedText style={styles.detailLabel}>Due Time</ThemedText>
+                            <ThemedText style={styles.detailValue}>{formattedTime}</ThemedText>
+                        </ThemedView>
+                    </ThemedView>
 
                     {/* Task Description */}
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Description</Text>
-                        <Text style={styles.sectionContent}>{task.content || 'No description provided.'}</Text>
-                    </View>
+                    <ThemedView style={styles.section}>
+                        <ThemedText style={styles.sectionTitle}>Description</ThemedText>
+                        <ThemedText style={styles.sectionContent}>{task.content || 'No description provided.'}</ThemedText>
+                    </ThemedView>
 
                     {/* Sub-tasks / Checklist */}
                     {subtasks.length > 0 && (
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Sub-tasks</Text>
+                        <ThemedView style={styles.section}>
+                            <ThemedText style={styles.sectionTitle}>Sub-tasks</ThemedText>
                             {subtasks.map((item, index) => (
                                 <TouchableOpacity key={index} style={styles.checklistItem} onPress={() => toggleSubTask(index)}>
-                                    <View style={styles.checkbox}>
+                                    <ThemedView style={styles.checkbox}>
                                         {item.completed && (<FontAwesome name="check" size={12} color="#4f46e5" />)}
-                                    </View>
-                                    <Text style={[styles.checklistText, item.completed && styles.completedText]}>
+                                    </ThemedView>
+                                    <ThemedText style={[styles.checklistText, item.completed && styles.completedText]}>
                                         {item.text}
-                                    </Text>
+                                    </ThemedText>
                                 </TouchableOpacity>
                             ))}
-                        </View>
+                        </ThemedView>
                     )}
 
                     {/* AI Suggestion */}
                     {task.aiSuggestion && (
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>AI Suggestion</Text>
-                            <View style={styles.aiSuggestionBox}>
-                                <Text style={styles.aiSuggestionText}>{task.aiSuggestion}</Text>
-                            </View>
-                        </View>
+                        <ThemedView style={styles.section}>
+                            <ThemedText style={styles.sectionTitle}>AI Suggestion</ThemedText>
+                            <ThemedView style={styles.aiSuggestionBox}>
+                                <ThemedText style={styles.aiSuggestionText}>{task.aiSuggestion}</ThemedText>
+                            </ThemedView>
+                        </ThemedView>
                     )}
                     <TouchableOpacity style={styles.updateButton} onPress={updateTaskInStorage}>
-                        <Text style={styles.updateButtonText}>Update Task</Text>
+                        <ThemedText style={styles.updateButtonText}>Update Task</ThemedText>
                     </TouchableOpacity>
-                </View>
+                </ThemedView>
             </ScrollView>
-        </SafeAreaView>
+        </ThemedSafeAreaView>
     );
 }
 
@@ -163,7 +165,6 @@ export default function TaskViewScreen() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
     },
     scrollView: {
         flex: 1,

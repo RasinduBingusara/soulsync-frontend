@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { TPriority } from '@/components/custom-interface/type';
 import { TaskProps } from './custom-interface/CustomProps';
 import { getDate, getTime } from '@/components/custom-function/DateTime';
+import { ThemedView } from './ThemedView';
+import { ThemedText } from './ThemedText';
 
 
 interface IDateTime {
@@ -43,60 +45,60 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
 
 
   return (
-    <View style={[styles.taskItem, true && styles.completedTask]}>
-      <View style={styles.taskItemContent}>
+    <ThemedView style={[styles.taskItem, true && styles.completedTask]} >
+      <ThemedView style={styles.taskItemContent} >
 
-        <View style={styles.taskDetails}>
+        <ThemedView style={styles.taskDetails}>
 
-          <Text style={styles.taskTitle}>
+          <ThemedText style={styles.taskTitle}>
             {task.title}
-          </Text>
+          </ThemedText>
 
-          <View style={styles.taskMeta}>
-            <Text style={styles.dueDateText}>Due: {getDate(task.dateTime)} / {getTime(task.dateTime)}</Text>
-            <View style={[styles.priorityTag, getPriorityStyle(task.priority)]}>
-              <Text style={styles.priorityText}>{task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</Text>
-            </View>
-          </View>
-          <Text style={styles.contentTitle}>
+          <ThemedView style={styles.taskMeta}>
+            <ThemedText style={styles.dueDateText}>Due: {getDate(task.dateTime)} / {getTime(task.dateTime)}</ThemedText>
+            <ThemedView style={[styles.priorityTag, getPriorityStyle(task.priority)]}>
+              <ThemedText style={styles.priorityText}>{task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</ThemedText>
+            </ThemedView>
+          </ThemedView>
+          <ThemedText style={styles.contentTitle}>
             {task.content}
-          </Text>
+          </ThemedText>
           {task.subtasks && Object.keys(task.subtasks).length > 0 && (
-            <View style={styles.subtasksContainer}>
-              <Text style={styles.subtasksTitle}>Subtasks:</Text>
+            <ThemedView style={styles.subtasksContainer}>
+              <ThemedText style={styles.subtasksTitle}>Subtasks:</ThemedText>
               {Object.entries(task.subtasks).map(([key, subtask]: [string, any]) => (
-                <View key={key} style={styles.subtaskRow}>
+                <ThemedView key={key} style={styles.subtaskRow}>
                   <FontAwesome
                     name={subtask.completed ? "check-square" : "square-o"}
                     size={16}
                     color={subtask.completed ? "#22c55e" : "#6b7280"}
                     style={{ marginRight: 8 }}
                   />
-                  <Text style={[
+                  <ThemedText style={[
                     styles.subtaskText,
                     subtask.completed && styles.completedSubtaskText
                   ]}>
                     {subtask.text}
-                  </Text>
-                </View>
+                  </ThemedText>
+                </ThemedView>
               ))}
-            </View>
+            </ThemedView>
           )}
-          <Text style={{ color: '#6b7280', fontSize: 12 }}>
+          <ThemedText style={{ color: '#6b7280', fontSize: 12 }}>
             AI Suggestion: {task.aiSuggestion}
-          </Text>
-        </View>
-      </View>
+          </ThemedText>
+        </ThemedView>
+      </ThemedView>
 
 
-      <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+      <ThemedView style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
         <TouchableOpacity onPress={editTask} style={styles.removeButton}>
           <FontAwesome name="edit" size={25} color="#039900ff" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={styles.removeButton}>
           <FontAwesome name="trash" size={25} color="#ef4444" />
         </TouchableOpacity>
-      </View>
+      </ThemedView>
 
       <Modal
         animationType="fade"
@@ -104,28 +106,28 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
         visible={showDeleteModal}
         onRequestClose={() => setShowDeleteModal(false)}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Are you sure you want to delete this task?</Text>
-            <View style={styles.modalButtons}>
+        <ThemedView style={styles.centeredView}>
+          <ThemedView style={styles.modalView}>
+            <ThemedText style={styles.modalText}>Are you sure you want to delete this task?</ThemedText>
+            <ThemedView style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.buttonCancel]}
                 onPress={() => setShowDeleteModal(false)}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <ThemedText style={styles.buttonText}>Cancel</ThemedText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.buttonDelete]}
                 onPress={confirmDelete}
               >
-                <Text style={styles.buttonText}>Delete</Text>
+                <ThemedText style={styles.buttonText}>Delete</ThemedText>
               </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+            </ThemedView>
+          </ThemedView>
+        </ThemedView>
       </Modal>
 
-    </View>
+    </ThemedView>
   );
 };
 
@@ -143,6 +145,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
   },
   completedTask: {
     backgroundColor: '#e5e7eb',

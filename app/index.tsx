@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/ThemedText'
 import { useEffect, useState } from 'react'
-import { TextInput, View, Button, ActivityIndicator, KeyboardAvoidingView, StyleSheet, Platform, Text, TouchableOpacity } from 'react-native'
+import { View, Button, ActivityIndicator, KeyboardAvoidingView, StyleSheet, Platform, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "@react-native-firebase/auth"
@@ -9,6 +9,8 @@ import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-si
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import '@/components/translation/i18n';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedInput } from '@/components/ThemedInput';
 
 
 export default function Auth() {
@@ -100,30 +102,30 @@ export default function Auth() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardAvoidingView}
             >
-                <View style={styles.container}>
+                <ThemedView style={styles.container}>
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>{t('auth.welcome_back')}</Text>
-                        <Text style={styles.headerSubtitle}>{t('auth.sign_in_to_account')}</Text>
+                        <ThemedText style={styles.headerTitle}>{t('auth.welcome_back')}</ThemedText>
+                        <ThemedText style={styles.headerSubtitle}>{t('auth.sign_in_to_account')}</ThemedText>
                     </View>
 
                     <View style={styles.socialLoginContainer}>
                         <TouchableOpacity style={styles.googleButton} onPress={() => SignInWithGoogleAuthentication()} disabled={loading}>
                             <FontAwesome name="google" size={24} color="black" style={styles.googleButtonIcon} />
-                            <Text style={styles.googleButtonText}>{t('auth.sign_in_with_google')}</Text>
+                            <ThemedText style={styles.googleButtonText}>{t('auth.sign_in_with_google')}</ThemedText>
                         </TouchableOpacity>
                     </View>
 
                     <View style={styles.dividerContainer}>
                         <View style={styles.dividerLine} />
-                        <Text style={styles.dividerText}>{t('auth.or_continue_with')}</Text>
+                        <ThemedText style={styles.dividerText}>{t('auth.or_continue_with')}</ThemedText>
                         <View style={styles.dividerLine} />
                     </View>
 
                     {/* Email & Password Form */}
                     <View style={styles.form}>
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>{t('auth.email_address')}</Text>
-                            <TextInput
+                            <ThemedText style={styles.label}>{t('auth.email_address')}</ThemedText>
+                            <ThemedInput
                                 style={styles.input}
                                 onChangeText={setEmail}
                                 value={email}
@@ -136,8 +138,8 @@ export default function Auth() {
                         </View>
 
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>{t('auth.password')}</Text>
-                            <TextInput
+                            <ThemedText style={styles.label}>{t('auth.password')}</ThemedText>
+                            <ThemedInput
                                 style={styles.input}
                                 onChangeText={setPassword}
                                 value={password}
@@ -149,26 +151,26 @@ export default function Auth() {
 
                         <View style={styles.forgotPasswordContainer}>
                             <TouchableOpacity>
-                                <Text style={styles.forgotPasswordText}>{t('auth.forgot_password')}</Text>
+                                <ThemedText style={styles.forgotPasswordText}>{t('auth.forgot_password')}</ThemedText>
                             </TouchableOpacity>
                         </View>
 
                         <View style={styles.signInButtonContainer}>
                             <TouchableOpacity style={styles.signInButton} onPress={SignIn} disabled={loading}>
-                                <Text style={styles.signInButtonText}>{t('auth.sign_in')}</Text>
+                                <ThemedText style={styles.signInButtonText}>{t('auth.sign_in')}</ThemedText>
                             </TouchableOpacity>
                         </View>
 
                         <View style={styles.signInLinkContainer}>
-                            <Text style={styles.signInLinkText}>
+                            <ThemedText style={styles.signInLinkText}>
                                 {t('auth.no_account_question')}
-                            </Text>
+                            </ThemedText>
                             <TouchableOpacity onPress={() => { router.push('/create_account') }}>
-                                <Text style={styles.signInLink}>{t('auth.create_account')}</Text>
+                                <ThemedText style={styles.signInLink}>{t('auth.create_account')}</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
+                </ThemedView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     )
@@ -177,7 +179,6 @@ export default function Auth() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#ffffffff',
     },
     keyboardAvoidingView: {
         flex: 1,
@@ -186,7 +187,6 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         maxWidth: 400,
-        backgroundColor: '#ffffffff',
         padding: 32,
         alignSelf: 'center',
         justifyContent: 'center',
@@ -198,10 +198,8 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#1f2937',
     },
     headerSubtitle: {
-        color: '#6b7280',
         marginTop: 4,
     },
     socialLoginContainer: {
@@ -216,7 +214,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#d1d5da',
         borderRadius: 9999,
-        backgroundColor: '#fff',
     },
     googleButtonIcon: {
         color: '#4285f4', // A simple representation of the Google G icon color
@@ -235,7 +232,7 @@ const styles = StyleSheet.create({
     dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: '#d1d5da',
+        backgroundColor: '#7a7a7aff',
     },
     dividerText: {
         marginHorizontal: 8,
@@ -262,7 +259,6 @@ const styles = StyleSheet.create({
         borderColor: '#d1d5da',
         borderRadius: 12,
         fontSize: 16,
-        color: '#1f2937',
     },
     forgotPasswordContainer: {
         alignItems: 'flex-end',

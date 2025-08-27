@@ -1,17 +1,20 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Alert, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 
-import { JournalEntry } from '@/components/JournalEntry';
-import { getAuth } from "@react-native-firebase/auth";
-import { addDoc, collection, getDocs, getFirestore, limit, orderBy, query, where } from '@react-native-firebase/firestore';
-import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
 import { PredictMood } from '@/components/custom-function/MoodPredictor';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTranslation } from 'react-i18next';
+import { IJournalDataResponse } from '@/components/custom-interface/CustomProps';
+import { JournalEntry } from '@/components/JournalEntry';
+import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedLabel } from '@/components/ThemedLabel';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import '@/components/translation/i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth } from "@react-native-firebase/auth";
+import { useTranslation } from 'react-i18next';
 
 
 export default function JournalCreate() {
@@ -101,24 +104,24 @@ export default function JournalCreate() {
 
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <ThemedSafeAreaView style={styles.safeArea}>
 
-            <View style={styles.headerContainer}>
+            <ThemedView style={styles.headerContainer}>
                 <TouchableOpacity style={styles.backButton} onPress={() => { router.push('..') }}>
                     <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>{t('journal.daily_journal')}</Text>
-            </View>
+                <ThemedText style={styles.headerTitle}>{t('journal.daily_journal')}</ThemedText>
+            </ThemedView>
 
-            <View style={styles.contentContainer}>
+            <ThemedView style={styles.contentContainer}>
 
-                <View style={styles.formSection}>
-                    <Text style={styles.formTitle}>{t('journal.how_are_you_feeling')}</Text>
+                <ThemedView style={styles.formSection}>
+                    <ThemedText style={styles.formTitle}>{t('journal.how_are_you_feeling')}</ThemedText>
 
                     {/* The Write Your Entry Section */}
-                    <View style={styles.inputGroupContainer}>
-                        <Text style={styles.inputLabel}>{t('journal.write_your_entry')}</Text>
-                        <TextInput
+                    <ThemedView style={styles.inputGroupContainer}>
+                        <ThemedLabel style={styles.inputLabel}>{t('journal.write_your_entry')}</ThemedLabel>
+                        <ThemedInput
                             style={styles.textArea}
                             placeholder={t('journal.share_your_thoughts_placeholder')}
                             placeholderTextColor="#9ca3af"
@@ -128,13 +131,13 @@ export default function JournalCreate() {
                             value={content}
                             onChangeText={(value) => setContent(value)}
                         />
-                    </View>
+                    </ThemedView>
                     {
                         isMoodPredicting && (
-                            <View style={{ marginVertical: 10 }}>
+                            <ThemedView style={{ marginVertical: 10 }}>
                                 <ActivityIndicator size="small" color="#007AFF" />
-                                <Text style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>{t('journal.predicting_mood')}</Text>
-                            </View>
+                                <ThemedText style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>{t('journal.predicting_mood')}</ThemedText>
+                            </ThemedView>
                         )
                     }
 
@@ -144,17 +147,17 @@ export default function JournalCreate() {
                         ) :
                             (
                                 <TouchableOpacity style={styles.saveButton} onPress={saveJournal}>
-                                    <Text style={styles.saveButtonText}>{t('journal.save_entry')}</Text>
+                                    <ThemedText style={styles.saveButtonText}>{t('journal.save_entry')}</ThemedText>
                                 </TouchableOpacity>
                             )
                     }
 
-                </View>
-            </View>
+                </ThemedView>
+            </ThemedView>
 
-            <View style={styles.previousEntriesSection}>
-                <Text style={styles.previousEntriesTitle}>{t('journal.previous_entries')}</Text>
-                <View style={styles.entriesList}>
+            <ThemedView style={styles.previousEntriesSection}>
+                <ThemedText style={styles.previousEntriesTitle}>{t('journal.previous_entries')}</ThemedText>
+                <ThemedView style={styles.entriesList}>
                     {lastJournals[0] ? (
                         <FlatList
                             data={lastJournals}
@@ -169,23 +172,22 @@ export default function JournalCreate() {
                         />
                     ) :
                         (
-                            <Text style={styles.noEntry}>{t('journal.no_journals_yet')}</Text>
+                            <ThemedText style={styles.noEntry}>{t('journal.no_journals_yet')}</ThemedText>
                         )
                     }
 
-                </View>
-            </View>
+                </ThemedView>
+            </ThemedView>
 
 
 
-        </SafeAreaView>
+        </ThemedSafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
     },
     contentContainer: {
         paddingHorizontal: 16,
@@ -224,9 +226,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#6b7280',
         position: 'absolute',
+        borderRadius: 4,
         top: 0,
         left: 12,
-        backgroundColor: 'white',
+        backgroundColor: '#686868ff',
         paddingHorizontal: 4,
         zIndex: 1,
     },

@@ -4,8 +4,6 @@ import {
     SafeAreaView,
     StyleSheet,
     View,
-    Text,
-    TextInput,
     TouchableOpacity,
     KeyboardAvoidingView,
     Platform,
@@ -13,6 +11,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import '@/components/translation/i18n';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedInput } from '@/components/ThemedInput';
 
 
 const CreateAccountScreen = () => {
@@ -43,15 +43,15 @@ const CreateAccountScreen = () => {
                     <View style={styles.container}>
                         {/* Header */}
                         <View style={styles.header}>
-                            <Text style={styles.headerTitle}>{t('create_account.title')}</Text>
-                            <Text style={styles.headerSubtitle}>{t('create_account.subtitle')}</Text>
+                            <ThemedText style={styles.headerTitle}>{t('create_account.title')}</ThemedText>
+                            <ThemedText style={styles.headerSubtitle}>{t('create_account.subtitle')}</ThemedText>
                         </View>
 
                         {/* Form */}
                         <View style={styles.form}>
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>{t('create_account.username')}</Text>
-                                <TextInput
+                                <ThemedText style={styles.label}>{t('create_account.username')}</ThemedText>
+                                <ThemedInput
                                     style={styles.input}
                                     onChangeText={setUsername}
                                     value={username}
@@ -63,8 +63,8 @@ const CreateAccountScreen = () => {
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>{t('create_account.email_address')}</Text>
-                                <TextInput
+                                <ThemedText style={styles.label}>{t('create_account.email_address')}</ThemedText>
+                                <ThemedInput
                                     style={styles.input}
                                     onChangeText={setEmail}
                                     value={email}
@@ -77,8 +77,8 @@ const CreateAccountScreen = () => {
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>{t('create_account.password')}</Text>
-                                <TextInput
+                                <ThemedText style={styles.label}>{t('create_account.password')}</ThemedText>
+                                <ThemedInput
                                     style={styles.input}
                                     onChangeText={setPassword}
                                     value={password}
@@ -89,8 +89,8 @@ const CreateAccountScreen = () => {
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.label}>{t('create_account.confirm_password')}</Text>
-                                <TextInput
+                                <ThemedText style={styles.label}>{t('create_account.confirm_password')}</ThemedText>
+                                <ThemedInput
                                     style={styles.input}
                                     onChangeText={setConfirmPassword}
                                     value={confirmPassword}
@@ -102,18 +102,18 @@ const CreateAccountScreen = () => {
 
                             <View style={styles.createAccountButtonContainer}>
                                 <TouchableOpacity style={styles.createAccountButton} onPress={handleCreateAccount}>
-                                    <Text style={styles.createAccountButtonText}>{t('create_account.create_account_button')}</Text>
+                                    <ThemedText style={styles.createAccountButtonText}>{t('create_account.create_account_button')}</ThemedText>
                                 </TouchableOpacity>
                             </View>
                         </View>
 
                         {/* Sign In Link */}
                         <View style={styles.signInLinkContainer}>
-                            <Text style={styles.signInLinkText}>
+                            <ThemedText style={styles.signInLinkText}>
                                 {t('create_account.already_have_account')}
-                            </Text>
+                            </ThemedText>
                             <TouchableOpacity onPress={() => { router.push('/') }}>
-                                <Text style={styles.signInLink}>{t('create_account.sign_in')}</Text>
+                                <ThemedText style={styles.signInLink}>{t('create_account.sign_in')}</ThemedText>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -126,7 +126,6 @@ const CreateAccountScreen = () => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#ffffffff',
     },
     keyboardAvoidingView: {
         flex: 1,
@@ -137,7 +136,6 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         maxWidth: 400,
-        backgroundColor: '#ffffffff',
         padding: 32,
         alignSelf: 'center',
         marginTop: 50,
@@ -149,10 +147,8 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#1f2937',
     },
     headerSubtitle: {
-        color: '#6b7280',
         marginTop: 4,
     },
     form: {
@@ -164,7 +160,6 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: '500',
-        color: '#374151',
         marginBottom: 4,
     },
     input: {
@@ -175,7 +170,6 @@ const styles = StyleSheet.create({
         borderColor: '#d1d5da',
         borderRadius: 12,
         fontSize: 16,
-        color: '#1f2937',
     },
     createAccountButtonContainer: {
         alignItems: 'center',
@@ -191,7 +185,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     createAccountButtonText: {
-        color: '#fff',
         fontWeight: '600',
         fontSize: 16,
     },
@@ -204,7 +197,6 @@ const styles = StyleSheet.create({
     },
     signInLinkText: {
         fontSize: 14,
-        color: '#6b7280',
     },
     signInLink: {
         fontWeight: '500',

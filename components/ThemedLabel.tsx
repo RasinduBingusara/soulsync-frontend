@@ -9,7 +9,7 @@ export type ThemedTextProps = TextProps & {
   fontSize?: number;
 };
 
-export function ThemedText({
+export function ThemedLabel({
   style,
   lightColor,
   darkColor,
@@ -21,7 +21,7 @@ export function ThemedText({
 
   return (
     <Text
-      style={[style, { color }]}
+      style={[style, { color, backgroundColor: useThemeColor({ light: lightColor, dark: darkColor }, 'background') }]}
       {...rest}
     />
   );

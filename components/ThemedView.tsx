@@ -5,23 +5,12 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 export type ThemedViewProps = ViewProps & {
   lightColor?: string;
   darkColor?: string;
+  style?: object;
 };
 
-export function ThemedView({lightColor, darkColor, ...otherProps }: ThemedViewProps) {
+
+export function ThemedView({ style, lightColor, darkColor, ...otherProps }:ThemedViewProps) {
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
-  return <View style={[{ backgroundColor }, style.block]} {...otherProps} />;
+  return <View style={[style,{ backgroundColor }]} {...otherProps} />;
 }
-
-const style = StyleSheet.create({
-  block: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 10,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-    gap: 15,
-  },
-});

@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { collection, addDoc, getFirestore } from '@react-native-firebase/firestore';
-import { getAuth } from '@react-native-firebase/auth';
-import { router } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { PredictMood } from '@/components/custom-function/MoodPredictor';
-import { useTranslation } from 'react-i18next';
+import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import '@/components/translation/i18n';
+import { FontAwesome } from '@expo/vector-icons';
+import { getAuth } from '@react-native-firebase/auth';
+import { addDoc, collection, getFirestore } from '@react-native-firebase/firestore';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, Alert, Button, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface checkBoxInter {
   isChecked: boolean;
@@ -18,10 +21,10 @@ interface checkBoxInter {
 const Checkbox = ({ isChecked, onToggle, label }: checkBoxInter) => {
   return (
     <TouchableOpacity onPress={onToggle} style={styles.container}>
-      <View style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
-        {isChecked && <Text style={styles.checkmark}>✓</Text>}
-      </View>
-      <Text style={styles.label}>{label}</Text>
+      <ThemedView style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
+        {isChecked && <ThemedText style={styles.checkmark}>✓</ThemedText>}
+      </ThemedView>
+      <ThemedText style={styles.label}>{label}</ThemedText>
     </TouchableOpacity>
   );
 };
@@ -73,20 +76,19 @@ const CreatePost = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <ThemedSafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        <View style={styles.headerContainer}>
+        <ThemedView style={styles.headerContainer}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.push('..')}>
             <FontAwesome name="arrow-left" size={24} color="#6b7280" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('post.create_post_title')}</Text>
-        </View>
-        <TextInput
+          <ThemedText style={styles.headerTitle}>{t('post.create_post_title')}</ThemedText>
+        </ThemedView>
+        <ThemedInput
           style={[styles.input, styles.contentInput]}
           placeholder={t('post.placeholder')}
           value={content}
           onChangeText={setContent}
-          placeholderTextColor="#6b7280"
           multiline
           textAlignVertical="top"
         />
@@ -97,10 +99,10 @@ const CreatePost = () => {
         />
         {
           isMoodPredicting && (
-            <View style={{ marginVertical: 10 }}>
+            <ThemedView style={{ marginVertical: 10 }}>
               <ActivityIndicator size="small" color="#007AFF" />
-              <Text style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>Predicting Mood...</Text>
-            </View>
+              <ThemedText style={{ textAlign: 'center', color: '#6b7280', marginTop: 5 }}>Predicting Mood...</ThemedText>
+            </ThemedView>
           )
         }
         {
@@ -115,20 +117,18 @@ const CreatePost = () => {
           )
         }
       </ScrollView>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
     paddingHorizontal:10
   },
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f8f8f8',
   },
   headerContainer: {
     flexDirection: 'row',
@@ -145,7 +145,6 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,

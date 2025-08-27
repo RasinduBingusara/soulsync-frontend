@@ -1,10 +1,12 @@
-import { View, StyleSheet, Text, TouchableOpacity, Modal } from "react-native";
+import {StyleSheet,TouchableOpacity, Modal } from "react-native";
 import { FontAwesome } from '@expo/vector-icons';
 import { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router } from "expo-router";
 import { IJournalPostData } from "./custom-interface/CustomProps";
 import { getDate, getTime } from '@/components/custom-function/DateTime';
+import { ThemedView } from "./ThemedView";
+import { ThemedText } from "./ThemedText";
 
 
 
@@ -37,32 +39,32 @@ export const JournalEntry = ({ id, content, createAt, mood, onDelete }: IJournal
     }, [createAt]);
 
     return (
-        <View style={[styles.journalItem, true && styles.completedJournal]}>
-            <View style={styles.journalItemContent}>
+        <ThemedView style={[styles.journalItem, true && styles.completedJournal]}>
+            <ThemedView style={styles.journalItemContent}>
 
-                <View style={styles.journalDetails}>
+                <ThemedView style={styles.journalDetails}>
 
-                    <View style={styles.journalMeta}>
-                        <Text style={styles.dueDateText}>{getDate(createAt)} / {getTime(createAt)}</Text>
-                    </View>
-                    <Text style={styles.contentTitle}>
+                    <ThemedView style={styles.journalMeta}>
+                        <ThemedText style={styles.dueDateText}>{getDate(createAt)} / {getTime(createAt)}</ThemedText>
+                    </ThemedView>
+                    <ThemedText style={styles.contentTitle}>
                         {content}
-                    </Text>
-                    <Text style={{ color: '#6b7280', fontSize: 12 }}>
+                    </ThemedText>
+                    <ThemedText style={{ color: '#6b7280', fontSize: 12 }}>
                         Mood: {mood}
-                    </Text>
-                </View>
-            </View>
+                    </ThemedText>
+                </ThemedView>
+            </ThemedView>
 
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <ThemedView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <TouchableOpacity onPress={editEntry} style={styles.removeButton}>
                     <FontAwesome name="edit" size={25} color="#179b05ff" />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={styles.removeButton}>
                     <FontAwesome name="trash" size={25} color="#ef4444" />
                 </TouchableOpacity>
-            </View>
+            </ThemedView>
 
             <Modal
                 animationType="fade"
@@ -70,28 +72,28 @@ export const JournalEntry = ({ id, content, createAt, mood, onDelete }: IJournal
                 visible={showDeleteModal}
                 onRequestClose={() => setShowDeleteModal(false)}
             >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Are you sure you want to delete this task?</Text>
-                        <View style={styles.modalButtons}>
+                <ThemedView style={styles.centeredView}>
+                    <ThemedView style={styles.modalView}>
+                        <ThemedText style={styles.modalText}>Are you sure you want to delete this task?</ThemedText>
+                        <ThemedView style={styles.modalButtons}>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.buttonCancel]}
                                 onPress={() => setShowDeleteModal(false)}
                             >
-                                <Text style={styles.buttonText}>Cancel</Text>
+                                <ThemedText style={styles.buttonText}>Cancel</ThemedText>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.buttonDelete]}
                                 onPress={confirmDelete}
                             >
-                                <Text style={styles.buttonText}>Delete</Text>
+                                <ThemedText style={styles.buttonText}>Delete</ThemedText>
                             </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
+                        </ThemedView>
+                    </ThemedView>
+                </ThemedView>
             </Modal>
 
-        </View>
+        </ThemedView>
     )
 };
 
@@ -108,6 +110,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 3,
         elevation: 1,
+        borderWidth:1,
+        borderColor: '#6a6a6aff',
     },
     completedJournal: {
         backgroundColor: '#e5e7eb',

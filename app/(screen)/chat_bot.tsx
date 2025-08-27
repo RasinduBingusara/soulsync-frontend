@@ -1,17 +1,19 @@
+import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedView } from '@/components/ThemedView';
+import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect, useRef } from 'react';
+import { router } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-    StyleSheet,
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    ScrollView,
     KeyboardAvoidingView,
     Platform,
-    FlatList,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 const CHAT_KEY = '@chat_messages';
 const ChatbotScreen = () => {
     const [userInput, setUserInput] = useState('');
@@ -51,7 +53,7 @@ const ChatbotScreen = () => {
     }, []); // Empty dependency array ensures this runs only once
 
     // Save messages to AsyncStorage
-    const saveMessages = async (currentMessages:any) => {
+    const saveMessages = async (currentMessages: any) => {
         try {
             const jsonValue = JSON.stringify(currentMessages);
             await AsyncStorage.setItem(CHAT_KEY, jsonValue);
@@ -70,7 +72,7 @@ const ChatbotScreen = () => {
         while (retries < maxRetries) {
             console.log('fetching');
             try {
-                console.log('await started: ',url);
+                console.log('await started: ', url);
                 const response = await fetch(url, options);
                 console.log(`API returned status: ${response.status}`);
 
@@ -122,7 +124,7 @@ const ChatbotScreen = () => {
                 role: msg.sender === 'user' ? 'user' : 'assistant',
                 content: [{ text: msg.text }]
             }));
-            
+
             // Add the new user message to the history before sending
             const currentHistory = [...historyForApi, {
                 role: 'user',
@@ -157,7 +159,7 @@ const ChatbotScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <ThemedSafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
                 style={styles.keyboardAvoidingView}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -165,10 +167,10 @@ const ChatbotScreen = () => {
                 {/* Chatbot Header */}
                 <View style={styles.header}>
                     <View style={styles.headerContent}>
-                        <View style={styles.botIcon}>
-                            <Text style={styles.botIconText}>G</Text>
-                        </View>
-                        <Text style={styles.headerTitle}>Gemini Chatbot</Text>
+                        <TouchableOpacity style={styles.backButton} onPress={() => { router.push('..') }}>
+                            <FontAwesome name="arrow-left" size={24} color="#6b7280" />
+                        </TouchableOpacity>
+                        <Text style={styles.headerTitle}>Assistant Chatbot</Text>
                     </View>
                 </View>
 
@@ -211,11 +213,10 @@ const ChatbotScreen = () => {
                     )}
                 </ScrollView>
 
-                <View style={styles.inputContainer}>
-                    <TextInput
+                <ThemedView style={styles.inputContainer}>
+                    <ThemedInput
                         style={styles.textInput}
                         placeholder="Type your message..."
-                        placeholderTextColor="#9ca3af"
                         value={userInput}
                         onChangeText={setUserInput}
                         onSubmitEditing={handleChat}
@@ -228,16 +229,15 @@ const ChatbotScreen = () => {
                     >
                         <Text style={styles.sendButtonText}>➔</Text>
                     </TouchableOpacity>
-                </View>
+                </ThemedView>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </ThemedSafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#e5e7eb',
     },
     keyboardAvoidingView: {
         flex: 1,
@@ -247,8 +247,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#4f46e5',
         padding: 16,
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'flex-start',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -257,7 +256,8 @@ const styles = StyleSheet.create({
     },
     headerContent: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        gap: 20,
     },
     botIcon: {
         width: 40,
@@ -281,7 +281,6 @@ const styles = StyleSheet.create({
     messagesContainer: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#f3f4f6',
     },
     messagesContent: {
         paddingBottom: 20,
@@ -346,12 +345,10 @@ const styles = StyleSheet.create({
     textInput: {
         flex: 1,
         height: 44,
-        backgroundColor: '#f9fafb',
         borderRadius: 22,
         paddingHorizontal: 16,
         marginRight: 10,
         fontSize: 16,
-        color: '#1f2937',
     },
     sendButton: {
         backgroundColor: '#4f46e5',
@@ -366,6 +363,9 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
     },
+    backButton: {
+        padding: 8,
+    }
 });
 
 export default ChatbotScreen;
