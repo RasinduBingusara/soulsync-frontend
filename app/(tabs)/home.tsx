@@ -19,10 +19,8 @@ import { saveDailyMood } from '@/components/custom-function/FireBaseFunctions'
 import { ActionSuggest } from '@/components/custom-function/SuggestionProvider'
 import { useTranslation } from 'react-i18next';
 import '@/components/translation/i18n';
+import { getSelectedLanguage, translateTextToEnglish, translateTextToSinhala } from '@/components/googletranslate/GoogleTranslator'
 
-interface IfeatureBlock {
-  title: string
-}
 
 interface IInteractiveBlock {
   title: string,
@@ -78,13 +76,34 @@ function HomeScreen() {
     }
   };
 
+  const getCorrectLanguageTextForModal = async (text: string) => {
+    const selectedLanguage = await getSelectedLanguage();
+    if (selectedLanguage === 'si') {
+      return translateTextToEnglish(text);
+    } else {
+      return text
+    }
+  };
+
+  const getCorrectLanguageTextFromModal = async (text: string) => {
+    const selectedLanguage = await getSelectedLanguage();
+    if (selectedLanguage === 'si') {
+      return translateTextToSinhala(text);
+    } else {
+      return text
+    }
+  };
+
   const getTodayMood = async () => {
     setLoading(true);
     try {
       console.log('Predicting mood for input:', aboutToday);
-      const mood = await PredictMood(aboutToday);
+      const translatedText = await getCorrectLanguageTextForModal(aboutToday);
+      let mood = await PredictMood(translatedText);
+      mood = await getCorrectLanguageTextFromModal(mood);
+
       if (mood) {
-        setEmotionSummary(`You seem to be feeling ${mood} today!`);
+        setEmotionSummary(t('home.predicted_mood_text', { mood }));
         console.log(`Predicted mood: ${mood}`);
         const action = await ActionSuggest(aboutToday);
         setSuggestedAction(action || '');

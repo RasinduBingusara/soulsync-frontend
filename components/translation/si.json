@@ -36,6 +36,7 @@
         "enter_message_placeholder": "ඔබේ පණිවිඩය මෙහි ඇතුළත් කරන්න...",
         "ai_suggestion": "AI යෝජනාව:",
         "how_about_your_day": "ඔබේ දිනය කෙසේද?",
+        "predicted_mood_text": "ඔබ අද {{mood}} ලෙස හැඟෙන්නේය!",
         "error_predicting_mood": "මනෝභාවය අනාවරණය කිරීමේ දෝෂයක්. කරුණාකර නැවත උත්සාහ කරන්න.",
         "no_mood_predicted": "ඔබේ මනෝභාවය අනාවරණය කළ නොහැක. කරුණාකර නැවත උත්සාහ කරන්න.",
         "clear_data_success": "Async Storage දත්ත සාර්ථකව ඉවත් කරන ලදී!",

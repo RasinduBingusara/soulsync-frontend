@@ -46,6 +46,7 @@
         "enter_message_placeholder": "Enter your message here...",
         "ai_suggestion": "AI Suggestion:",
         "how_about_your_day": "How about your day?",
+        "predicted_mood_text": "You seem to be feeling {{mood}} today!",
         "error_predicting_mood": "Error predicting mood. Please try again.",
         "no_mood_predicted": "Couldn't predict your mood. Please try again.",
         "clear_data_success": "Async Storage data cleared successfully!",

@@ -80,10 +80,10 @@ export default function App() {
         <SafeAreaView style={combinedStyles.container}>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
+                <View style={styles.header}>
                 <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)/home')}>
                     <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                 </TouchableOpacity>
-                <View style={styles.header}>
                     <Text style={combinedStyles.headerText}>{t('settings.settings')}</Text>
                 </View>
 
@@ -121,33 +121,6 @@ export default function App() {
                     <View style={combinedStyles.separator} />
 
                     <View style={styles.section}>
-                        <Text style={combinedStyles.sectionTitle}>{t('settings.notifications')}</Text>
-                        <SettingsItem label={t('settings.journal_reminders')}>
-                            <Switch
-                                ios_backgroundColor={journalReminders ? '#4f46e5' : '#ccc'}
-                                onValueChange={setJournalReminders}
-                                value={journalReminders}
-                            />
-                        </SettingsItem>
-                        <SettingsItem label={t('settings.task_updates')}>
-                            <Switch
-                                ios_backgroundColor={taskUpdates ? '#4f46e5' : '#ccc'}
-                                onValueChange={setTaskUpdates}
-                                value={taskUpdates}
-                            />
-                        </SettingsItem>
-                        <SettingsItem label={t('settings.push_notifications')} isLastItem>
-                            <Switch
-                                ios_backgroundColor={pushNotifications ? '#4f46e5' : '#ccc'}
-                                onValueChange={setPushNotifications}
-                                value={pushNotifications}
-                            />
-                        </SettingsItem>
-                    </View>
-
-                    <View style={combinedStyles.separator} />
-
-                    <View style={styles.section}>
                         <Text style={combinedStyles.sectionTitle}>{t('settings.privacy')}</Text>
                         {/* <SettingsItem label="Data Sharing">
                             <Switch
@@ -172,9 +145,8 @@ export default function App() {
 // --- Stylesheet for Components ---
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         padding: 16,
-        fontFamily: 'System', // Using a generic system font for cross-platform compatibility
+        fontFamily: 'System',
     },
     scrollContent: {
         flexGrow: 1,
@@ -184,6 +156,9 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         marginBottom: 32,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        gap: 16,
     },
     headerText: {
         fontSize: 28,
