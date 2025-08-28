@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, FlatList, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { collection, getDocs, getFirestore, query, where } from '@react-native-firebase/firestore'
+import { collection, getDocs, getFirestore, query, where,orderBy,doc,limit,startAfter } from '@react-native-firebase/firestore'
 import { getAuth } from "@react-native-firebase/auth"
 import { FontAwesome } from '@expo/vector-icons';
 import { PostProps } from '@/components/custom-interface/CustomProps';
@@ -19,43 +19,76 @@ function community() {
   const { t } = useTranslation();
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [loading, setLoading] = useState(false);
+  const [lastVisible, setLastVisible] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const db = getFirestore();
   const userEmail = getAuth().currentUser?.email;
 
-  const getPostsByEmail = async () => {
-    setLoading(true);
-    const newPosts: PostProps[] = [];
-    try {
+  const fetchInitialPosts = async () => {
+        setLoading(true);
+        try {
+            // Create a query to get posts ordered by comment count (min to max), limited to 10
+            const q = query(collection(db, "Posts"), orderBy("commentsCount", "asc"), limit(10));
+            const querySnapshot = await getDocs(q);
 
-      const q = query(collection(db, "Posts"), where("email", "==", 'rasindubingusara1@gmail.com'));
+            const fetchedPosts: PostProps[] = [];
+            querySnapshot.forEach((doc:any) => {
+                fetchedPosts.push({ id: doc.id, ...doc.data() });
+            });
+            setPosts(fetchedPosts);
 
-      const querySnapshot = await getDocs(q);
+            // Store the last document snapshot for the next query
+            const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+            setLastVisible(lastDoc);
 
-      if (querySnapshot.empty) {
-        console.log("No posts found for this email.");
-        return;
-      }
+            // Check if there are more documents to fetch
+            setHasMore(querySnapshot.docs.length === 10);
+            
+        } catch (error) {
+            console.error("Error fetching initial posts:", error);
+        }
+        setLoading(false);
+    };
 
-      querySnapshot.forEach((doc: any) => {
-        const postData = { id: doc.id, ...doc.data() } as PostProps;
-        newPosts.push(postData);
-        console.log(`Post ID: ${doc.id}`, "Data: ", doc.data());
-      });
+    const fetchMorePosts = async () => {
+        if (!db || !lastVisible || !hasMore) return;
+        setLoading(true);
+        try {
+            // Create a new query that starts after the last visible document
+            const q = query(
+                collection(db, "Posts"),
+                orderBy("comments", "asc"),
+                startAfter(lastVisible),
+                limit(10)
+            );
+            const querySnapshot = await getDocs(q);
 
-    } catch (error) {
-      console.error("Error getting documents: ", error);
-    }
-    finally {
-      setPosts(newPosts);
-      setLoading(false);
-    }
-  };
+            const newPosts: PostProps[] = [];
+            querySnapshot.forEach((doc:any) => {
+                newPosts.push({ id: doc.id, ...doc.data() });
+            });
+            
+            // Append the new posts to the existing list
+            setPosts(prevPosts => [...prevPosts, ...newPosts]);
+
+            // Update the last visible document for the next pagination request
+            const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+            setLastVisible(lastDoc || null);
+
+            // Update the 'hasMore' state
+            setHasMore(querySnapshot.docs.length === 10);
+
+        } catch (error) {
+            console.error("Error fetching more posts:", error);
+        }
+        setLoading(false);
+    };
 
   const onRefresh = useCallback(async () => {
     setLoading(true);
     try {
-      getPostsByEmail();
+      fetchInitialPosts();
     } catch (error) {
       console.error("Failed to fetch new entries:", error);
     } finally {
@@ -64,8 +97,8 @@ function community() {
   }, []);
 
   useEffect(() => {
-    getPostsByEmail();
-  }, [])
+    fetchInitialPosts();
+  }, [db])
 
   return (
     <ThemedSafeAreaView style={styles.safeArea}>

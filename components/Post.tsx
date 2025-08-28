@@ -1,5 +1,5 @@
 import { getAuth } from '@react-native-firebase/auth';
-import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, setDoc } from '@react-native-firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getFirestore, onSnapshot, setDoc, runTransaction } from '@react-native-firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Button, FlatList, KeyboardAvoidingView, Modal, Platform, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -94,12 +94,25 @@ const Post = ({ id, content, mood, uid, email, isAnonymouse, profileName }: Post
     if (!user || !id || !commentText.trim()) return;
 
     setLoading(true);
+    const postRef = doc(db, "Posts", id);
     try {
-      await addDoc(collection(db, 'Posts', id, 'comments'), {
-        userId: user.uid,
-        userName: user.displayName,
-        comment: commentText.trim(),
-        timestamp: new Date(),
+      await runTransaction(db, async (transaction) => {
+        // Get the current state of the post
+        const postDoc : any = await transaction.get(postRef);
+        if (!postDoc.exists()) {
+          return;
+        }
+
+        // Read the current comment count
+        const currentCount = postDoc.data().commentCount || 0;
+
+        await addDoc(collection(db, 'Posts', id, 'comments'), {
+          userId: user.uid,
+          userName: user.displayName,
+          comment: commentText.trim(),
+          timestamp: new Date(),
+        });
+        transaction.update(postRef, { commentsCount: currentCount + 1 });
       });
       setCommentText(''); // Clear the input field
       console.log('Comment added successfully!');
