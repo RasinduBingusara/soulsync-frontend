@@ -137,11 +137,14 @@ export default function Profile() {
     }, [])
     return (
         <SafeAreaView style={styles.safeArea}>
+            <ThemedView style={styles.headerContainer} backgroundVisible={false}>
+                <TouchableOpacity style={styles.backButton} onPress={() => router.push('..')}>
+                    <FontAwesome name="arrow-left" size={24} color="#6b7280" />
+                </TouchableOpacity>
+                <ThemedText style={styles.headerTitle}>{t('profile.title')}</ThemedText>
+            </ThemedView>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 {/* Header Section */}
-                <View style={styles.header}>
-                    <ThemedText style={styles.headerTitle}>{t('profile.title')}</ThemedText>
-                </View>
 
                 {/* Profile Card */}
                 <ThemedView style={styles.mainCard}>
@@ -240,6 +243,16 @@ const styles = StyleSheet.create({
     header: {
         marginBottom: 24,
         alignItems: 'center',
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 24,
+        justifyContent: 'flex-start',
+        gap: 12
+    },
+    backButton: {
+        padding: 8,
     },
     headerTitle: {
         fontSize: 28,

@@ -45,16 +45,16 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
 
 
   return (
-    <ThemedView style={[styles.taskItem, true && styles.completedTask]} >
-      <ThemedView style={styles.taskItemContent} >
+    <ThemedView style={[styles.taskItem, true && styles.completedTask]} darkColor='#333333ff'>
+      <ThemedView style={styles.taskItemContent} backgroundVisible={false}>
 
-        <ThemedView style={styles.taskDetails}>
+        <ThemedView style={styles.taskDetails} backgroundVisible={false}>
 
           <ThemedText style={styles.taskTitle}>
             {task.title}
           </ThemedText>
 
-          <ThemedView style={styles.taskMeta}>
+          <ThemedView style={styles.taskMeta} backgroundVisible={false}>
             <ThemedText style={styles.dueDateText}>Due: {getDate(task.dateTime)} / {getTime(task.dateTime)}</ThemedText>
             <ThemedView style={[styles.priorityTag, getPriorityStyle(task.priority)]}>
               <ThemedText style={styles.priorityText}>{task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</ThemedText>
@@ -64,10 +64,10 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
             {task.content}
           </ThemedText>
           {task.subtasks && Object.keys(task.subtasks).length > 0 && (
-            <ThemedView style={styles.subtasksContainer}>
+            <ThemedView style={styles.subtasksContainer} >
               <ThemedText style={styles.subtasksTitle}>Subtasks:</ThemedText>
               {Object.entries(task.subtasks).map(([key, subtask]: [string, any]) => (
-                <ThemedView key={key} style={styles.subtaskRow}>
+                <ThemedView key={key} style={styles.subtaskRow} backgroundVisible={false}>
                   <FontAwesome
                     name={subtask.completed ? "check-square" : "square-o"}
                     size={16}
@@ -91,7 +91,7 @@ const TaskItem = ({ task, onEdit, onRemoveTask }: TaskProps) => {
       </ThemedView>
 
 
-      <ThemedView style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+      <ThemedView style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }} backgroundVisible={false}>
         <TouchableOpacity onPress={editTask} style={styles.removeButton}>
           <FontAwesome name="edit" size={25} color="#039900ff" />
         </TouchableOpacity>
@@ -144,8 +144,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 4,
     elevation: 2,
-    borderWidth: 1,
-    borderColor: '#0055ffff',
   },
   completedTask: {
     backgroundColor: '#e5e7eb',
@@ -214,7 +212,6 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     marginLeft: 12,
-    backgroundColor: '#fee2e2',
     borderRadius: 8,
     padding: 6,
   },

@@ -114,11 +114,11 @@ export default function TaskList() {
     }, []);
 
     return (
-        <ThemedSafeAreaView style={styles.safeArea}>
-            <ThemedView style={styles.container}>
+        <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
+            <ThemedView style={styles.container} backgroundVisible={false}>
 
                 {/* Header Section */}
-                <ThemedView style={styles.headerContainer}>
+                <ThemedView style={styles.headerContainer} backgroundVisible={false}>
                     <ThemedText style={styles.headerTitle}>{t('task_list.title')}</ThemedText>
                 </ThemedView>
                 {latestTasks.length > 0 ? (
@@ -136,7 +136,7 @@ export default function TaskList() {
                     />
                 ) :
                     (
-                        <ThemedText style={{ textAlign: 'center'}}>
+                        <ThemedText style={{ textAlign: 'center' }}>
                             {t('task_list.no_tasks')}
                         </ThemedText>
                     )}
@@ -157,13 +157,13 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        padding: 16,
+        padding: 10,
     },
     headerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 24,
+        marginBottom: 10,
     },
     headerTitle: {
         fontSize: 28,

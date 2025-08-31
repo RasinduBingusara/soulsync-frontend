@@ -1,4 +1,4 @@
-import {StyleSheet,TouchableOpacity, Modal } from "react-native";
+import { StyleSheet, TouchableOpacity, Modal } from "react-native";
 import { FontAwesome } from '@expo/vector-icons';
 import { useEffect, useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -39,14 +39,23 @@ export const JournalEntry = ({ id, content, createAt, mood, onDelete }: IJournal
     }, [createAt]);
 
     return (
-        <ThemedView style={[styles.journalItem, true && styles.completedJournal]}>
-            <ThemedView style={styles.journalItemContent}>
+        <ThemedView style={[styles.journalItem, true && styles.completedJournal]} darkColor='#333333ff'>
+            <ThemedView style={styles.journalItemContent} backgroundVisible={false}>
 
-                <ThemedView style={styles.journalDetails}>
+                <ThemedView style={styles.journalDetails} backgroundVisible={false}>
 
-                    <ThemedView style={styles.journalMeta}>
+                    <ThemedView style={styles.journalMeta} backgroundVisible={false}>
                         <ThemedText style={styles.dueDateText}>{getDate(createAt)} / {getTime(createAt)}</ThemedText>
+                        <ThemedView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }} backgroundVisible={false}>
+                            <TouchableOpacity onPress={editEntry} style={styles.removeButton}>
+                                <FontAwesome name="edit" size={25} color="#179b05ff" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={styles.removeButton}>
+                                <FontAwesome name="trash" size={25} color="#ef4444" />
+                            </TouchableOpacity>
+                        </ThemedView>
                     </ThemedView>
+
                     <ThemedText style={styles.contentTitle}>
                         {content}
                     </ThemedText>
@@ -54,16 +63,6 @@ export const JournalEntry = ({ id, content, createAt, mood, onDelete }: IJournal
                         Mood: {mood}
                     </ThemedText>
                 </ThemedView>
-            </ThemedView>
-
-
-            <ThemedView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <TouchableOpacity onPress={editEntry} style={styles.removeButton}>
-                    <FontAwesome name="edit" size={25} color="#179b05ff" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={styles.removeButton}>
-                    <FontAwesome name="trash" size={25} color="#ef4444" />
-                </TouchableOpacity>
             </ThemedView>
 
             <Modal
@@ -110,8 +109,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 3,
         elevation: 1,
-        borderWidth:1,
-        borderColor: '#6a6a6aff',
     },
     completedJournal: {
         backgroundColor: '#e5e7eb',
@@ -125,6 +122,7 @@ const styles = StyleSheet.create({
     journalDetails: {
         marginLeft: 16,
         flexShrink: 1,
+        gap: 8,
     },
     journalTitle: {
         fontSize: 16,
@@ -141,6 +139,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 4,
+        justifyContent: 'space-between'
     },
     dueDateText: {
         fontSize: 10,

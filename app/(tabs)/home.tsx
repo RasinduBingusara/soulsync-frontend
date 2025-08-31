@@ -33,7 +33,7 @@ interface IInteractiveBlock {
 
 const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress, suggestion }: IInteractiveBlock) => {
   return (
-    <TouchableOpacity style={isMain ? styles.mainBlock : styles.interactiveBlock} onPress={onPress}>
+    <ThemedTouchableOpacity style={isMain ? styles.mainBlock : styles.interactiveBlock} onPress={onPress}>
       {isMain ? (
         <View style={styles.mainBlockContent}>
           <View>
@@ -47,12 +47,12 @@ const InteractiveBlock = ({ title, iconName, subtitle, isMain = false, onPress, 
           </View>
         </View>
       ) : (
-        <View style={styles.interactiveBlockContent}>
+        <ThemedView style={styles.interactiveBlockContent}>
           <FontAwesome name={iconName} size={32} color="#4f46e5" />
           <ThemedText style={styles.interactiveBlockTitle}>{title}</ThemedText>
-        </View>
+        </ThemedView>
       )}
-    </TouchableOpacity>
+    </ThemedTouchableOpacity>
   );
 };
 
@@ -70,7 +70,7 @@ function HomeScreen() {
   const clearChatData = async () => {
     try {
       await AsyncStorage.removeItem(`@chat_messages:${auth.currentUser?.uid}`);
-      console.log('Async Storage data cleared successfully!');
+      console.log('clear chat');
     } catch (e) {
       console.error('Failed to clear Async Storage:', e);
     }
@@ -326,8 +326,8 @@ const styles = StyleSheet.create({
     rowGap: 16,
   },
   interactiveBlock: {
-    borderColor: '#838383ff',
-    borderWidth: 1,
+    borderWidth:1,
+    borderColor:'#494949ff',
     borderRadius: 16,
     padding: 24,
     width: '48%', // Approx. 2 columns with a small gap

@@ -120,10 +120,10 @@ export default function TaskCreate() {
   }
 
   return (
-    <ThemedSafeAreaView style={styles.safeArea}>
+    <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000'>
       <ScrollView style={styles.scrollView}>
 
-        <ThemedView style={styles.headerContainer}>
+        <ThemedView style={styles.headerContainer} backgroundVisible={false}>
           <TouchableOpacity style={styles.backButton} onPress={() => router.push('..')}>
             <FontAwesome name="arrow-left" size={24} color="#6b7280" />
           </TouchableOpacity>
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   formSection: {
     backgroundColor: 'white',
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: '#aaaaaaff',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,

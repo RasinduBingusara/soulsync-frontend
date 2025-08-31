@@ -124,7 +124,6 @@ export default function JournalCreate() {
                         <ThemedInput
                             style={styles.textArea}
                             placeholder={t('journal.share_your_thoughts_placeholder')}
-                            placeholderTextColor="#9ca3af"
                             multiline={true}
                             numberOfLines={5}
                             textAlignVertical="top"
@@ -224,7 +223,6 @@ const styles = StyleSheet.create({
     },
     inputLabel: {
         fontSize: 12,
-        color: '#6b7280',
         position: 'absolute',
         borderRadius: 4,
         top: 0,
@@ -241,7 +239,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 8,
         fontSize: 14,
-        color: '#1f2937',
     },
     textArea: {
         height: 200,
@@ -251,7 +248,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 12,
         fontSize: 14,
-        color: '#1f2937',
     },
     formTitle: {
         fontSize: 18,

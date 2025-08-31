@@ -100,8 +100,8 @@ export default function JournalList() {
 
 
   return (
-    <ThemedSafeAreaView style={styles.safeArea}>
-      <ThemedView style={styles.headerContainer}>
+    <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
+      <ThemedView style={styles.headerContainer} backgroundVisible={false}>
         <ThemedText style={styles.headerTitle}>{t('journal_list.title')}</ThemedText>
       </ThemedView>
       {displayedJournals.length > 0 ? (

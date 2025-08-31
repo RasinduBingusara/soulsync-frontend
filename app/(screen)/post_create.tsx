@@ -20,7 +20,7 @@ interface checkBoxInter {
 
 const Checkbox = ({ isChecked, onToggle, label }: checkBoxInter) => {
   return (
-    <TouchableOpacity onPress={onToggle} style={styles.container}>
+    <TouchableOpacity onPress={onToggle} style={{flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
       <ThemedView style={[styles.checkbox, isChecked && styles.checkedCheckbox]}>
         {isChecked && <ThemedText style={styles.checkmark}>✓</ThemedText>}
       </ThemedView>
@@ -159,7 +159,8 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: '#8b8b8bff',
+    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,

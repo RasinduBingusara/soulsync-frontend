@@ -1,8 +1,8 @@
-import { StyleSheet, TouchableOpacity, View, type ViewProps } from 'react-native';
+import { StyleSheet, TouchableOpacity, type TouchableOpacityProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/useThemeColor';
 
-export type ListViewProps = ViewProps & {
+export type ListViewProps = TouchableOpacityProps & {
     lightColor?: string;
     darkColor?: string;
     margin?: number;
