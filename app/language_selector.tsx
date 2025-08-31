@@ -1,4 +1,6 @@
 import { saveLanguagePreference } from '@/components/custom-function/LanguagePreference';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { getAuth } from '@react-native-firebase/auth';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -30,16 +32,16 @@ export default function LanguageSelectionScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Choose Your Language</Text>
-          <Text style={styles.subtitle}>
+    <ThemedView style={styles.container} darkColor='#000000ff'>
+      <ThemedView style={styles.card}>
+        <ThemedView style={styles.header}>
+          <ThemedText style={styles.title}>Choose Your Language</ThemedText>
+          <ThemedText style={styles.subtitle}>
             Please select your preferred language. This choice cannot be changed later.
-          </Text>
-        </View>
+          </ThemedText>
+        </ThemedView>
 
-        <View style={styles.languageOptions}>
+        <ThemedView style={styles.languageOptions}>
           <TouchableOpacity
             style={[
               styles.option,
@@ -57,13 +59,13 @@ export default function LanguageSelectionScreen() {
             onPress={() => setSelectedLanguage('si')}>
             <Text style={styles.optionText}>සිංහල (Sinhala)</Text>
           </TouchableOpacity>
-        </View>
+        </ThemedView>
 
         <TouchableOpacity style={styles.button} onPress={handleSelectLanguage}>
           <Text style={styles.buttonText}>Confirm Selection</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+      </ThemedView>
+    </ThemedView>
   );
 }
 

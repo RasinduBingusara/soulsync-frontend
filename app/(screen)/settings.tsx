@@ -1,15 +1,19 @@
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { FontAwesome } from '@expo/vector-icons';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // --- Reusable Settings Item Component ---
 const SettingsItem = ({ label, children, isLastItem }: any) => {
     return (
         <View style={[styles.item, isLastItem && styles.lastItem]}>
-            <Text style={styles.itemLabel}>{label}</Text>
+            <ThemedText style={styles.itemLabel}>{label}</ThemedText>
             <View style={styles.itemRightContent}>
                 {children}
             </View>
@@ -17,53 +21,37 @@ const SettingsItem = ({ label, children, isLastItem }: any) => {
     );
 };
 
-// --- Main Settings Screen Component ---
 export default function App() {
 
     const { t, i18n } = useTranslation();
-
-    const [isDarkTheme, setIsDarkTheme] = useState(false);
+    const systemTheme = useColorScheme();
+    const [theme, setTheme] = useState(systemTheme === 'dark' ? DarkTheme : DefaultTheme);
     const [emailNotifications, setEmailNotifications] = useState(true);
-    const [journalReminders, setJournalReminders] = useState(false);
-    const [taskUpdates, setTaskUpdates] = useState(true);
-    const [pushNotifications, setPushNotifications] = useState(true);
-    const [dataSharing, setDataSharing] = useState(false);
 
-
-    // Function to toggle the theme
-    const toggleTheme = () => setIsDarkTheme(previousState => !previousState);
-
-    // Set up dynamic styles based on theme
-    const themeStyles = isDarkTheme ? darkStyles : lightStyles;
-    const combinedStyles = {
-        container: { ...styles.container, ...themeStyles.container },
-        headerText: { ...styles.headerText, ...themeStyles.headerText },
-        card: { ...styles.card, ...themeStyles.card },
-        sectionTitle: { ...styles.sectionTitle, ...themeStyles.sectionTitle },
-        separator: { ...styles.separator, ...themeStyles.separator },
-        linkText: { ...styles.linkText, ...themeStyles.linkText },
-        deleteButtonText: { ...styles.deleteButtonText, ...themeStyles.deleteButtonText },
+    const toggleTheme = () => {
+        setTheme(prevTheme => prevTheme === DefaultTheme ? DarkTheme : DefaultTheme);
+        console.log('theme:',theme)
     };
 
     return (
-        <SafeAreaView style={combinedStyles.container}>
+        <ThemedSafeAreaView style={styles.container} darkColor='#000000ff'>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)/home')}>
-                    <FontAwesome name="arrow-left" size={24} color="#6b7280" />
-                </TouchableOpacity>
-                    <Text style={combinedStyles.headerText}>{t('settings.settings')}</Text>
-                </View>
+                <ThemedView style={styles.header} backgroundVisible={false}>
+                    <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)/home')}>
+                        <FontAwesome name="arrow-left" size={24} color="#6b7280" />
+                    </TouchableOpacity>
+                    <ThemedText style={styles.headerText}>{t('settings.settings')}</ThemedText>
+                </ThemedView>
 
-                <View style={combinedStyles.card}>
-                    <View style={styles.section}>
-                        <Text style={combinedStyles.sectionTitle}>{t('settings.account')}</Text>
+                <ThemedView style={styles.card}>
+                    <ThemedView style={styles.section}>
+                        <ThemedText style={styles.sectionTitle}>{t('settings.account')}</ThemedText>
                         <SettingsItem label={t('settings.theme')}>
                             <Switch
-                                ios_backgroundColor={isDarkTheme ? '#4f46e5' : '#ccc'}
+                                ios_backgroundColor={theme ? '#4f46e5' : '#ccc'}
                                 onValueChange={toggleTheme}
-                                value={isDarkTheme}
+                                value={theme.dark}
                             />
                         </SettingsItem>
                         <SettingsItem label={t('settings.email_notifications')}>
@@ -75,15 +63,15 @@ export default function App() {
                         </SettingsItem>
                         <SettingsItem label={t('settings.delete_account')} isLastItem>
                             <TouchableOpacity onPress={() => console.log('Delete Account pressed')}>
-                                <Text style={combinedStyles.deleteButtonText}>{t('settings.delete')}</Text>
+                                <ThemedText style={styles.deleteButtonText}>{t('settings.delete')}</ThemedText>
                             </TouchableOpacity>
                         </SettingsItem>
-                    </View>
+                    </ThemedView>
 
-                    <View style={combinedStyles.separator} />
+                    <View style={styles.separator} />
 
-                    <View style={styles.section}>
-                        <Text style={combinedStyles.sectionTitle}>{t('settings.privacy')}</Text>
+                    <ThemedView style={styles.section}>
+                        <ThemedText style={styles.sectionTitle}>{t('settings.privacy')}</ThemedText>
                         {/* <SettingsItem label="Data Sharing">
                             <Switch
                                 ios_backgroundColor={dataSharing ? '#4f46e5' : '#ccc'}
@@ -93,13 +81,13 @@ export default function App() {
                         </SettingsItem> */}
                         <SettingsItem label={t('settings.view_privacy_policy')} isLastItem>
                             <TouchableOpacity onPress={() => console.log('View Privacy Policy pressed')}>
-                                <Text style={combinedStyles.linkText}>{t('settings.view')}</Text>
+                                <ThemedText style={styles.linkText}>{t('settings.view')}</ThemedText>
                             </TouchableOpacity>
                         </SettingsItem>
-                    </View>
-                </View>
+                    </ThemedView>
+                </ThemedView>
             </ScrollView>
-        </SafeAreaView>
+        </ThemedSafeAreaView>
 
     );
 }
@@ -174,61 +162,6 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: '#e5e7eb',
         marginVertical: 16,
-    },
-    backButton: {
-        padding: 8,
-    }
-});
-
-// --- Theme-specific styles ---
-const lightStyles = StyleSheet.create({
-    container: {
-        backgroundColor: '#f3f4f6',
-    },
-    headerText: {
-        color: '#1f2937',
-    },
-    card: {
-        backgroundColor: '#ffffff',
-    },
-    sectionTitle: {
-        color: '#1f2937',
-    },
-    linkText: {
-        color: '#4f46e5',
-    },
-    deleteButtonText: {
-        color: '#ef4444',
-    },
-    separator: {
-        backgroundColor: '#e5e7eb',
-    },
-    backButton: {
-        padding: 8,
-    }
-});
-
-const darkStyles = StyleSheet.create({
-    container: {
-        backgroundColor: '#1a202c',
-    },
-    headerText: {
-        color: '#cbd5e0',
-    },
-    card: {
-        backgroundColor: '#2d3748',
-    },
-    sectionTitle: {
-        color: '#cbd5e0',
-    },
-    linkText: {
-        color: '#9f7aea',
-    },
-    deleteButtonText: {
-        color: '#f87171',
-    },
-    separator: {
-        backgroundColor: '#4a5568',
     },
     backButton: {
         padding: 8,

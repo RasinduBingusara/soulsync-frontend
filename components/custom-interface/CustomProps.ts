@@ -1,3 +1,5 @@
+import { Slice } from "react-native-pie-chart";
+
 // Post
 export interface PostProps {
   id: string;
@@ -24,7 +26,7 @@ export interface IJournalDataResponse {
   content: string,
   createAt: string,
   mood: string,
-  uid:string
+  uid: string
 }
 
 export interface IJournalPostData {
@@ -32,7 +34,7 @@ export interface IJournalPostData {
   content: string,
   createAt: string,
   mood: string
-  onDelete: (id:string) => void
+  onDelete: (id: string) => void
 }
 
 // Task
@@ -40,25 +42,25 @@ export interface IJournalPostData {
 type TPriority = 'low' | 'medium' | 'high';
 
 interface ISubtask {
-    completed: boolean;
-    text: string;
+  completed: boolean;
+  text: string;
 }
 
 interface ISubtasksMap {
-    [key: string]: ISubtask;
+  [key: string]: ISubtask;
 }
 
 
 export interface ITask {
-    id: string,
-    uid: string,
-    content: string,
-    aiSuggestion: string,
-    completed: boolean,
-    priority: TPriority,
-    subtasks: ISubtasksMap,
-    title: string,
-    dateTime: string
+  id: string,
+  uid: string,
+  content: string,
+  aiSuggestion: string,
+  completed: boolean,
+  priority: TPriority,
+  subtasks: ISubtasksMap,
+  title: string,
+  dateTime: string
 }
 
 export interface TaskProps {
@@ -68,8 +70,14 @@ export interface TaskProps {
 }
 
 export interface DailyMood {
-  uid: string, 
-  mood: string, 
-  aboutToday:string, 
-  date:string
+  uid: string,
+  mood: string,
+  aboutToday: string,
+  date: string
+}
+
+export interface PieChartData {
+  series: Slice[];
+  sliceColor: string[];
+  labels: string[];
 }

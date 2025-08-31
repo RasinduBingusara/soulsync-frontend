@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet,  View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PieChart from 'react-native-pie-chart';
 import { FontAwesome } from '@expo/vector-icons';
@@ -7,6 +7,9 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from '@react-native-firebase/auth';
 import { DailyMood } from '@/components/custom-interface/CustomProps';
+import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
 
 const { width } = Dimensions.get('window');
 
@@ -32,9 +35,19 @@ const moodCategoryMap: { [key: number]: string } = {
     2: 'Positive'
 };
 
+const emotions = {
+    anger: { color: '#ef4444', icon: 'frown-o' },
+    joy: { color: '#22c55e', icon: 'smile-o' },
+    sadness: { color: '#3b82f6', icon: 'frown-o' },
+    fear: { color: '#eab308', icon: 'meh-o' },
+    love: { color: '#ec4899', icon: 'heart-o' },
+    neutral: { color: '#94a3b8', icon: 'meh-o' },
+};
+
 export default function Dashboard() {
     const [dailyMoods, setDailyMoods] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [seriseList, setSerise] = useState<Array<{ value: number, color: string }>>([]);
 
     const getLast7DaysMoods = async (): Promise<DailyMood[]> => {
         try {
@@ -86,96 +99,148 @@ export default function Dashboard() {
         }
     };
 
+    const getPieChartSeriesData = async (days: number): Promise<Array<{ value: number, color: string }>> => {
+        try {
+            const uid = getAuth().currentUser?.uid || '';
+            const storedMoods = await AsyncStorage.getItem('DailyMoods');
+            const moods: DailyMood[] = storedMoods ? JSON.parse(storedMoods) : [];
+
+            if (!Array.isArray(moods)) {
+                console.error("Stored data is not a valid mood array.");
+                return [];
+            }
+
+            const counts: { [key: string]: number } = {
+                anger: 1,
+                joy: 0,
+                sadness: 0,
+                fear: 0,
+                love: 0,
+                neutral: 0,
+            };
+            const today = new Date();
+
+            for (let i = 0; i < days; i++) {
+                const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+                const dateString = date.toISOString().slice(0, 10);
+
+                const moodEntry = moods.find(
+                    (item) => item.date === dateString && item.uid === uid
+                );
+
+                if (moodEntry) {
+                    // Initialize the count if the emotion hasn't been seen yet
+                    if (counts[moodEntry.mood]) {
+                        counts[moodEntry.mood]++;
+                    } else {
+                        counts[moodEntry.mood] = 1;
+                    }
+                }
+            }
+            console.log("counts:", counts)
+
+            const pieChartSeries = Object.keys(counts)
+                .map(label => ({
+                    value: counts[label],
+                    color: emotions[label as keyof typeof emotions]?.color || '#8f4646ff'
+                }));
+
+            return pieChartSeries;
+
+        } catch (error) {
+            console.error("Error fetching pie chart data:", error);
+            return [];
+        }
+    };
+
     useEffect(() => {
+
         const fetchMoods = async () => {
             try {
-                console.log('last 7 days moods:', await getLast7DaysMoods());
+                const last30DaysCounts = await getPieChartSeriesData(30);
+                setSerise(last30DaysCounts);
+                console.log('Emotion counts for last 30 days:', last30DaysCounts);
+                // console.log('last 7 days moods:', await getLast7DaysMoods());
                 fetchDailyMoods();
             } catch (error) {
                 console.error("Failed to fetch moods:", error);
             }
         };
         fetchMoods();
-        fetchDailyMoods();
     }, []);
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
             <ScrollView style={styles.container}>
                 {/* Header */}
-                <View style={styles.headerContainer}>
+                <ThemedView style={styles.headerContainer} backgroundVisible={false}>
                     <TouchableOpacity style={styles.backButton} onPress={() => { router.push('..') }}>
                         <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Emotion Dashboard</Text>
-                </View>
+                    <ThemedText style={styles.headerTitle}>Emotion Dashboard</ThemedText>
+                </ThemedView>
 
-                <View style={styles.chartCard}>
-                    <Text style={styles.cardTitle}>Your Daily Moods</Text>
+                <ThemedView style={styles.chartCard}>
+                    <ThemedText style={styles.cardTitle}>Your Daily Moods</ThemedText>
                     {dailyMoods.length === 0 ? (
-                        <Text style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded.</Text>
+                        <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded.</ThemedText>
                     ) : (
                         dailyMoods.map((entry, idx) => (
-                            <View key={idx} style={styles.dailyMoodRow}>
-                                <Text style={styles.dailyMoodDate}>{entry.date}</Text>
-                                <View style={[styles.dailyMoodTag, {
+                            <ThemedView key={idx} style={styles.dailyMoodRow} darkColor='#2727276e'>
+                                <ThemedText style={styles.dailyMoodDate}>{entry.date}</ThemedText>
+                                <ThemedView style={[styles.dailyMoodTag, {
                                     backgroundColor:
                                         entry.mood === 0 ? '#ef4444' :
                                             entry.mood === 1 ? '#eab308' :
                                                 entry.mood === 2 ? '#22c55e' : '#94a3b8'
                                 }]}>
-                                    <Text style={styles.dailyMoodText}>{moodCategoryMap[entry.mood] || entry.mood}</Text>
-                                </View>
-                                <Text style={styles.dailyMoodAbout}>{entry.aboutToday}</Text>
-                            </View>
+                                    <ThemedText style={styles.dailyMoodText}>{moodCategoryMap[entry.mood] || entry.mood}</ThemedText>
+                                </ThemedView>
+                                <ThemedText style={styles.dailyMoodAbout}>{entry.aboutToday}</ThemedText>
+                            </ThemedView>
                         ))
                     )}
-                </View>
+                </ThemedView>
 
                 {/* Charts Container */}
-                <View style={styles.chartsContainer}>
-                    <View style={styles.chartCard}>
-                        <Text style={styles.cardTitle}>Monthly Emotion Distribution</Text>
-                        <PieChart
-                            widthAndHeight={250}
-                            series={[
-                                { value: 10, color: '#ef4444' },
-                                { value: 4, color: '#eab308' },
-                                { value: 5, color: '#22c55e' },
-                                { value: 2, color: '#ec4899' },
-                                { value: 5, color: '#94a3b8' },
-                                { value: 3, color: '#3b82f6' }
-                            ]}
-                        />
-                        <View style={styles.pieContainer}>
-                            {pieData.map((item, index) => (
-                                <View key={index} style={styles.pieItem}>
-                                    <View style={[styles.pieColor, { backgroundColor: item.color }]} />
-                                    <Text style={styles.pieLabel}>{item.label}</Text>
-                                    <Text style={styles.pieValue}>{[10, 4, 5, 2, 5, 3][index]}</Text>
-                                </View>
+                <ThemedView style={styles.chartsContainer} backgroundVisible={false}>
+                    <ThemedView style={styles.chartCard}>
+                        <ThemedText style={styles.cardTitle}>Monthly Emotion Distribution</ThemedText>
+                        {
+                            seriseList[0] && (
+                                <PieChart
+                                    widthAndHeight={250}
+                                    series={seriseList}
+                                />
+                            )
+                        }
+
+                        <ThemedView style={styles.pieContainer}>
+                            {Object.keys(emotions).map((emotion, index) => (
+                                <ThemedView key={index} style={styles.pieItem}>
+                                    <View style={[styles.pieColor, { backgroundColor: emotions[emotion as keyof typeof emotions].color }]} />
+                                    <ThemedText style={styles.pieLabel}>{emotion}</ThemedText>
+                                </ThemedView>
                             ))}
-                        </View>
-                    </View>
-                    {/* ...LineGraphComponent can go here if needed... */}
-                </View>
+                        </ThemedView>
+                    </ThemedView>
+                </ThemedView>
 
                 {/* Analysis Section */}
-                <View style={styles.analysisCard}>
-                    <Text style={styles.cardTitle}>Insights & Analysis</Text>
-                    <Text style={styles.analysisText}>
+                <ThemedView style={styles.analysisCard}>
+                    <ThemedText style={styles.cardTitle}>Insights & Analysis</ThemedText>
+                    <ThemedText style={styles.analysisText}>
                         This week, your morning moods show a slightly different pattern than your evening moods. A clear positive trend is visible towards the end of the week, suggesting your emotional well-being is on the rise.
-                    </Text>
-                </View>
+                    </ThemedText>
+                </ThemedView>
             </ScrollView>
-        </SafeAreaView>
+        </ThemedSafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
     },
     container: {
         flex: 1,
@@ -210,9 +275,8 @@ const styles = StyleSheet.create({
     },
     chartCard: {
         alignItems: 'center',
-        backgroundColor: 'white',
         borderRadius: 24,
-        shadowColor: '#000',
+        shadowColor: '#6f6f6fff',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.1,
         shadowRadius: 10,
@@ -233,7 +297,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: 16,
+        gap: 10,
         marginTop: 16,
     },
     pieItem: {
@@ -328,7 +392,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#f1f5f9',
-        borderRadius: 10,
+        borderRadius: 20,
         padding: 10,
         marginBottom: 8,
         gap: 10,
@@ -347,7 +411,6 @@ const styles = StyleSheet.create({
     dailyMoodText: {
         fontSize: 13,
         fontWeight: '700',
-        color: 'white',
     },
     dailyMoodAbout: {
         fontSize: 13,
