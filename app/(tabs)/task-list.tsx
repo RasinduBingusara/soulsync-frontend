@@ -42,29 +42,32 @@ export default function TaskList() {
         }
     };
 
-    const loadTasks = async (count: number) => {
-        setLoading(true);
+    const getTasksSortedByTimeLeft = async () => {
         try {
-            const tasksString = await AsyncStorage.getItem('Tasks');
-            let tasks: ITask[] = [];
-            if (tasksString) {
-                tasks = JSON.parse(tasksString);
-            }
-            if (user?.uid) {
-                tasks = tasks.filter(task => task.uid === user.uid);
-            }
-            // Sort by dateTime descending
-            tasks.sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
-            // Limit to count
-            setLatestTasks(tasks.slice(0, count));
+        const storedTasks = await AsyncStorage.getItem('Tasks');
+        const tasks: ITask[] = storedTasks ? JSON.parse(storedTasks) : [];
+
+        // Check if the data is a valid array
+        if (!Array.isArray(tasks)) {
+            console.error("Stored data is not a valid task array.");
+            return [];
         }
-        catch (e) {
-            console.log('Error loading tasks: ', e)
-        }
-        finally {
-            setLoading(false);
-        }
+
+        // Sort the tasks directly by their due date timestamps.
+        // `getTime()` converts the date and time string into a number (milliseconds),
+        // allowing for a direct numerical comparison.
+        tasks.sort((a:ITask, b:ITask) => {
+            const dateA = new Date(a.dateTime).getTime();
+            const dateB = new Date(b.dateTime).getTime();
+            return dateA - dateB;
+        });
+
+        console.log("Tasks sorted by due date successfully.");
+        setLatestTasks(tasks);
+    } catch (error) {
+        console.error("Error retrieving and sorting tasks:", error);
     }
+    };
 
     const deleteTask = async (id: string) => {
         console.log('Delete task id: ', id);
@@ -78,7 +81,7 @@ export default function TaskList() {
             // Remove task by id
             const updatedTasks = tasks.filter(task => task.id !== id);
             await AsyncStorage.setItem('Tasks', JSON.stringify(updatedTasks));
-            loadTasks(10);
+            await getTasksSortedByTimeLeft();
         }
         catch (err) {
             console.log('Error deleting task: ', err);
@@ -101,7 +104,7 @@ export default function TaskList() {
     const onRefresh = useCallback(async () => {
         setLoading(true);
         try {
-            loadTasks(5);
+            await getTasksSortedByTimeLeft();
         } catch (error) {
             console.error("Failed to fetch new entries:", error);
         } finally {
@@ -110,7 +113,7 @@ export default function TaskList() {
     }, []);
 
     useEffect(() => {
-        loadTasks(5);
+        getTasksSortedByTimeLeft();
     }, []);
 
     return (
