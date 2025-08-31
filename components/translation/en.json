@@ -167,5 +167,12 @@
         "username_placeholder": "Choose a username",
         "email_placeholder": "name@example.com",
         "password_placeholder": "********"
+    },
+    "chat":{
+        "title": "Chat",
+        "placeholder": "Type your message...",
+        "send_button": "Send",
+        "how_can_i_help": "Hello! How can I help you today?",
+        "how_can_i_help_with_emotion": "Hello! How can I help you today? You seem to be feeling {{mood}} today!"
     }
 }

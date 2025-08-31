@@ -6,6 +6,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth } from '@react-native-firebase/auth';
+import { DailyMood } from '@/components/custom-interface/CustomProps';
 
 const { width } = Dimensions.get('window');
 
@@ -35,25 +36,66 @@ export default function Dashboard() {
     const [dailyMoods, setDailyMoods] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
+    const getLast7DaysMoods = async (): Promise<DailyMood[]> => {
+        try {
+            const uid = getAuth().currentUser?.uid || '';
+            const storedMoods = await AsyncStorage.getItem('DailyMoods');
+            const moods: DailyMood[] = storedMoods ? JSON.parse(storedMoods) : [];
+
+            const last7DaysMoods: DailyMood[] = [];
+            const today = new Date();
+
+            for (let i = 0; i < 3; i++) {
+                // Find the mood entry for the specific day and user
+                const moodEntry = moods.find(
+                    (item) => item.uid === uid
+                );
+
+                if (moodEntry) {
+                    last7DaysMoods.push(moodEntry);
+                } else {
+                    null;
+                }
+            }
+
+            // Reverse the array to have the oldest day first, which is useful for charting
+            return last7DaysMoods.reverse();
+
+        } catch (error) {
+            console.error("Error fetching last 7 days moods:", error);
+            return [];
+        }
+    };
+
+    const fetchDailyMoods = async () => {
+        setLoading(true);
+        try {
+            const auth = getAuth();
+            const uid = auth.currentUser?.uid || '';
+            const stored = await AsyncStorage.getItem('DailyMoods');
+            let moods = stored ? JSON.parse(stored) : [];
+            // Only show moods for current user
+            moods = moods.filter((item: any) => item.uid === uid);
+            // Sort by date descending
+            moods.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            setDailyMoods(moods);
+        } catch (e) {
+            console.error('Error loading daily moods:', e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchDailyMoods = async () => {
-            setLoading(true);
+        const fetchMoods = async () => {
             try {
-                const auth = getAuth();
-                const uid = auth.currentUser?.uid || '';
-                const stored = await AsyncStorage.getItem('DailyMoods');
-                let moods = stored ? JSON.parse(stored) : [];
-                // Only show moods for current user
-                moods = moods.filter((item: any) => item.uid === uid);
-                // Sort by date descending
-                moods.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-                setDailyMoods(moods);
-            } catch (e) {
-                console.error('Error loading daily moods:', e);
-            } finally {
-                setLoading(false);
+                console.log('last 7 days moods:', await getLast7DaysMoods());
+                fetchDailyMoods();
+            } catch (error) {
+                console.error("Failed to fetch moods:", error);
             }
         };
+        fetchMoods();
         fetchDailyMoods();
     }, []);
 
@@ -68,7 +110,6 @@ export default function Dashboard() {
                     <Text style={styles.headerTitle}>Emotion Dashboard</Text>
                 </View>
 
-                {/* Daily Mood Section */}
                 <View style={styles.chartCard}>
                     <Text style={styles.cardTitle}>Your Daily Moods</Text>
                     {dailyMoods.length === 0 ? (
@@ -283,7 +324,7 @@ const styles = StyleSheet.create({
         color: '#4b5563',
         textAlign: 'center',
     },
-     dailyMoodRow: {
+    dailyMoodRow: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#f1f5f9',

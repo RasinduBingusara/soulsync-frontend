@@ -129,7 +129,7 @@ export default function JournalList() {
         />
       ) :
         (
-          <Text style={styles.noEntry}>{t('journal_list.no_entries')}</Text>
+          <ThemedText style={{ textAlign: 'center'}}>{t('journal_list.no_entries')}</ThemedText>
         )
       }
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/journal_create') }}>

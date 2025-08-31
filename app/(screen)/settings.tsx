@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, Switch, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTranslation } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // --- Reusable Settings Item Component ---
 const SettingsItem = ({ label, children, isLastItem }: any) => {
@@ -24,42 +23,12 @@ export default function App() {
     const { t, i18n } = useTranslation();
 
     const [isDarkTheme, setIsDarkTheme] = useState(false);
-    const [enTranslate, setEnTranslate] = useState(false);
     const [emailNotifications, setEmailNotifications] = useState(true);
     const [journalReminders, setJournalReminders] = useState(false);
     const [taskUpdates, setTaskUpdates] = useState(true);
     const [pushNotifications, setPushNotifications] = useState(true);
     const [dataSharing, setDataSharing] = useState(false);
 
-    const changeLanguage = async (lng: any) => {
-        await i18n.changeLanguage(lng);
-        await AsyncStorage.setItem('selected-language', lng);
-    };
-    useEffect(() => {
-        const getSelectedLanguage = async () => {
-            const storedLang = await AsyncStorage.getItem('selected-language');
-            if (storedLang === 'en') {
-                setEnTranslate(false);
-            } else {
-                setEnTranslate(true);
-            }
-        };
-        getSelectedLanguage();
-    }, []);
-
-    
-
-    const toggleLanguage = () => {
-        setEnTranslate(previousState => !previousState);
-        if (enTranslate) {
-            changeLanguage('en');
-            setEnTranslate(false);
-        }
-        else {
-            changeLanguage('si');
-            setEnTranslate(true);
-        }
-    }
 
     // Function to toggle the theme
     const toggleTheme = () => setIsDarkTheme(previousState => !previousState);
@@ -90,13 +59,6 @@ export default function App() {
                 <View style={combinedStyles.card}>
                     <View style={styles.section}>
                         <Text style={combinedStyles.sectionTitle}>{t('settings.account')}</Text>
-                        <SettingsItem label={t('settings.language')}>
-                            <Switch
-                                ios_backgroundColor={isDarkTheme ? '#4f46e5' : '#ccc'}
-                                onValueChange={toggleLanguage}
-                                value={enTranslate}
-                            />
-                        </SettingsItem>
                         <SettingsItem label={t('settings.theme')}>
                             <Switch
                                 ios_backgroundColor={isDarkTheme ? '#4f46e5' : '#ccc'}

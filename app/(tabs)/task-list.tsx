@@ -89,15 +89,13 @@ export default function TaskList() {
     }
 
     const renderTaskItem = ({ item }: { item: ITask }) => (
-        <ThemedView style={styles.taskItem}>
-            <TaskItem
-                key={item.id}
-                task={item}
-                onEdit={() => { console.log('Edit id: ', item.id) }}
-                onRemoveTask={() => { deleteTask(item.id) }}
-            />
+        <TaskItem
+            key={item.id}
+            task={item}
+            onEdit={() => { console.log('Edit id: ', item.id) }}
+            onRemoveTask={() => { deleteTask(item.id) }}
+        />
 
-        </ThemedView>
     );
 
     const onRefresh = useCallback(async () => {
@@ -123,19 +121,26 @@ export default function TaskList() {
                 <ThemedView style={styles.headerContainer}>
                     <ThemedText style={styles.headerTitle}>{t('task_list.title')}</ThemedText>
                 </ThemedView>
+                {latestTasks.length > 0 ? (
+                    <FlatList
+                        data={latestTasks}
+                        renderItem={renderTaskItem}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={loading}
+                                onRefresh={onRefresh}
+                                colors={['#0059ffff']}
+                            />
+                        }
+                        contentContainerStyle={styles.entriesList}
+                    />
+                ) :
+                    (
+                        <ThemedText style={{ textAlign: 'center'}}>
+                            {t('task_list.no_tasks')}
+                        </ThemedText>
+                    )}
 
-                <FlatList
-                    data={latestTasks}
-                    renderItem={renderTaskItem}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={loading}
-                            onRefresh={onRefresh}
-                            colors={['#0059ffff']}
-                        />
-                    }
-                    contentContainerStyle={styles.entriesList}
-                />
 
             </ThemedView>
 
@@ -289,7 +294,7 @@ const styles = StyleSheet.create({
         marginLeft: 16,
     },
     entriesList: {
-        gap: 16,
+        gap: 15,
         paddingBottom: 10
     },
     fab: {

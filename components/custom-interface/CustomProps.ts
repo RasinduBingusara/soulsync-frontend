@@ -66,3 +66,10 @@ export interface TaskProps {
   onEdit: () => void,
   onRemoveTask: (id: string) => void
 }
+
+export interface DailyMood {
+  uid: string, 
+  mood: string, 
+  aboutToday:string, 
+  date:string
+}

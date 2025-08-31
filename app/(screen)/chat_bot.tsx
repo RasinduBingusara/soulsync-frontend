@@ -3,8 +3,10 @@ import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
 import { ThemedView } from '@/components/ThemedView';
 import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth } from '@react-native-firebase/auth';
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     KeyboardAvoidingView,
     Platform,
@@ -14,14 +16,14 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-const CHAT_KEY = '@chat_messages';
 const ChatbotScreen = () => {
+    const { t, i18n } = useTranslation();
     const [userInput, setUserInput] = useState('');
-    const [messages, setMessages] = useState([
-        { text: 'Hello! How can I help you today?', sender: 'bot' },
-    ]);
+    const [messages, setMessages] = useState<any[]>([]);
     const [isTyping, setIsTyping] = useState(false);
     const scrollViewRef = useRef<ScrollView | null>(null);
+    const auth = getAuth();
+    const CHAT_KEY = `@chat_messages:${auth.currentUser?.uid}`;
 
     // Function to add a new message to the state
     const addMessage = (text: string, sender: string) => {
@@ -32,15 +34,36 @@ const ChatbotScreen = () => {
         });
     };
 
+    const checkBotMessageUpdate = async () => {
+        try {
+            console.log('Checking for bot message update based on today\'s mood...');
+            const today = new Date().toISOString().slice(0, 10);
+            const uid = auth.currentUser?.uid || '';
+            const stored = await AsyncStorage.getItem('DailyMoods');
+            let moods = stored ? JSON.parse(stored) : [];
+            const index = moods.findIndex((item: any) => item.date === today && item.uid === uid);
+            if (index !== -1) {
+                console.log('Today\'s mood entry index:', index);
+                console.log('Updating bot message based on today\'s mood:', moods[index].mood);
+                    setMessages([{ text: t('chat.how_can_i_help_with_emotion', { mood: moods[index].mood }), sender: 'bot' }]);
+            }
+            else{
+                console.log('No mood entry found for today.');
+                setMessages([{ text: t('chat.how_can_i_help'), sender: 'bot' }]);
+            }
+        }
+        catch (e) {
+            console.error('Error checking today\'s mood:', e);
+        }
+    }
+
     useEffect(() => {
+        checkBotMessageUpdate();
         const loadMessages = async () => {
             try {
                 const storedMessages = await AsyncStorage.getItem(CHAT_KEY);
                 if (storedMessages !== null) {
                     setMessages(JSON.parse(storedMessages));
-                } else {
-                    // Set an initial welcome message if no data exists
-                    setMessages([{ text: 'Hello! How can I help you today?', sender: 'bot' }]);
                 }
             } catch (error) {
                 console.error('Failed to load messages from AsyncStorage', error);
@@ -52,7 +75,6 @@ const ChatbotScreen = () => {
         loadMessages();
     }, []); // Empty dependency array ensures this runs only once
 
-    // Save messages to AsyncStorage
     const saveMessages = async (currentMessages: any) => {
         try {
             const jsonValue = JSON.stringify(currentMessages);
@@ -170,7 +192,7 @@ const ChatbotScreen = () => {
                         <TouchableOpacity style={styles.backButton} onPress={() => { router.push('..') }}>
                             <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                         </TouchableOpacity>
-                        <Text style={styles.headerTitle}>Assistant Chatbot</Text>
+                        <Text style={styles.headerTitle}>{t('chat.title')}</Text>
                     </View>
                 </View>
 
@@ -216,7 +238,7 @@ const ChatbotScreen = () => {
                 <ThemedView style={styles.inputContainer}>
                     <ThemedInput
                         style={styles.textInput}
-                        placeholder="Type your message..."
+                        placeholder={t('chat.placeholder')}
                         value={userInput}
                         onChangeText={setUserInput}
                         onSubmitEditing={handleChat}

@@ -157,5 +157,13 @@
         "username_placeholder": "පරිශීලක නාමයක් තෝරන්න",
         "email_placeholder": "name@example.com",
         "password_placeholder": "********"
+    },
+    "chat":{
+        "title": "චැට්",
+        "placeholder": "ඔබේ පණිවිඩය මෙහි ඇතුළත් කරන්න...",
+        "send_button": "යවන්න",
+        "how_can_i_help": "හෙලෝ! අද ඔබට මට කෙසේ උදව් කළ හැකිද?",
+        "how_can_i_help_with_emotion": "හෙලෝ! අද ඔබට මට කෙසේ උදව් කළ හැකිද? ඔබට අද {{mood}} බවක් දැනෙයි!"
+
     }
 }

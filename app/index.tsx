@@ -65,7 +65,7 @@ export default function Auth() {
             console.log('password: ', password);
             await signInWithEmailAndPassword(auth, email, password);
             alert('Check your emails!')
-            router.push('/(tabs)/home');
+            // router.push('/(tabs)/home');
         }
         catch (error) {
             const err = error as FirebaseError;

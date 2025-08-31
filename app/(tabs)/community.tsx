@@ -133,7 +133,7 @@ function community() {
         />
       ) :
         (
-          <Text style={styles.noEntry}>{t('community_list.no_entries')}</Text>
+          <ThemedText style={{ textAlign: 'center'}}>{t('community_list.no_entries')}</ThemedText>
         )
       }
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/post_create') }}>

@@ -67,9 +67,9 @@ function HomeScreen() {
 
   const auth = getAuth();
 
-  const clearAllData = async () => {
+  const clearChatData = async () => {
     try {
-      await AsyncStorage.clear();
+      await AsyncStorage.removeItem(`@chat_messages:${auth.currentUser?.uid}`);
       console.log('Async Storage data cleared successfully!');
     } catch (e) {
       console.error('Failed to clear Async Storage:', e);
@@ -110,7 +110,7 @@ function HomeScreen() {
 
         const today = new Date().toISOString().slice(0, 10);
         const uid = auth.currentUser?.uid || '';
-        const newEntry = { uid, mood, aboutToday, date: today };
+        const newEntry = { uid, mood, aboutToday, date: today, aiSuggestion: action };
 
         try {
           const stored = await AsyncStorage.getItem('DailyMoods');
@@ -140,9 +140,33 @@ function HomeScreen() {
     }
   };
 
-  // useEffect(() => {
-  //   setIsPopUpVisible(true);
-  // }, [])
+  const getIsTodayMoodCheck = async () => {
+    try {
+
+      const today = new Date().toISOString().slice(0, 10);
+      const uid = auth.currentUser?.uid || '';
+      const stored = await AsyncStorage.getItem('DailyMoods');
+      let moods = stored ? JSON.parse(stored) : [];
+      const index = moods.findIndex((item: any) => item.date === today && item.uid === uid);
+
+      if (index !== -1) {
+        setEmotionSummary(t('home.predicted_mood_text', { mood: moods[index].mood }));
+        setSuggestedAction(moods[index].aiSuggestion || '');
+        setAboutToday(moods[index].aboutToday || '');
+      } else {
+        clearChatData()
+        setIsPopUpVisible(true);
+      }
+    }
+    catch (e) {
+      console.error('Error checking today\'s mood:', e);
+    }
+  }
+
+  useEffect(() => {
+    // clearChatData();
+    getIsTodayMoodCheck();
+  }, [])
   useEffect(() => {
     const currentUser = auth.currentUser;
     if (currentUser) {

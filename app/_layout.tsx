@@ -5,8 +5,11 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useEffect, useState } from 'react';
-import {getAuth, FirebaseAuthTypes, onAuthStateChanged as onAuthChanged } from '@react-native-firebase/auth';
+import { use, useEffect, useState } from 'react';
+import { getAuth, FirebaseAuthTypes, onAuthStateChanged as onAuthChanged } from '@react-native-firebase/auth';
+import { getLanguagePreference } from '@/components/custom-function/LanguagePreference';
+import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type SanitizedUser = {
   uid: string;
@@ -23,6 +26,8 @@ export default function RootLayout() {
 
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<SanitizedUser>(null)
+  const [languageCode, setLanguageCode] = useState<string | null>(null);
+  const { i18n } = useTranslation();
 
   const sanitizeUser = (user: FirebaseAuthTypes.User | null) => {
     if (!user) {
@@ -38,10 +43,10 @@ export default function RootLayout() {
     };
   };
 
-  const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) =>{
-    
+  const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
+
     const sanitizedUser = sanitizeUser(user);
-    
+
     console.log('onAuthStateChanged', sanitizedUser);
     setUser(sanitizedUser);
     if (initializing) {
@@ -49,29 +54,53 @@ export default function RootLayout() {
     }
   }
   useEffect(() => {
-    const subscriber = onAuthChanged(getAuth(),onAuthStateChanged);
+    const subscriber = onAuthChanged(getAuth(), onAuthStateChanged);
     return subscriber
-  },[]);
+  }, []);
 
   useEffect(() => {
-    if(initializing) return;
+    const uid = user?.uid.toString() || '';
+    const getlanguage = async () => {
+      try {
+        const lcode = await getLanguagePreference(uid);
+        if (lcode !== null) {
+          await i18n.changeLanguage(lcode);
+          await AsyncStorage.setItem('selected-language', lcode);
+        }
+        setLanguageCode(lcode);
+      }
+      catch (e) {
+        console.error("Error retrieving language preference:", e);
+      }
+    }
+    getlanguage();
+  }, [user]);
+
+  useEffect(() => {
+    if (initializing) return;
 
     const inAuthGroup = segments[0] === '(tabs)';
-    if(user && !inAuthGroup){
-      router.replace('/(tabs)/home')
-    }else if(!user && inAuthGroup){
-      router.replace('/')
+    console.log(languageCode);
+    if (user && !inAuthGroup && languageCode !== null) {
+      router.replace('/(tabs)/home');
     }
-  },[user, initializing])
+    else if (user && !inAuthGroup && languageCode === null) {
+      router.replace('/language_selector');
+    }
+    else if (!user && inAuthGroup && languageCode === null) {
+      router.replace('/');
+    }
+  }, [user, initializing, languageCode])
 
   const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="index" options={{headerShown:false}}/>
-        <Stack.Screen name="create_account" options={{headerShown:false}}/>
-        <Stack.Screen name="forgot_password" options={{headerShown:false}}/>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="language_selector" options={{ headerShown: false }} />
+        <Stack.Screen name="create_account" options={{ headerShown: false }} />
+        <Stack.Screen name="forgot_password" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(screen)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
