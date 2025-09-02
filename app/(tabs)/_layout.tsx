@@ -62,6 +62,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons name="journal" size={24} color={color} />,
         }}
       />
+
+      <Tabs.Screen
+        name="learning-zone"
+        options={{
+          title: 'Learning Zone',
+          tabBarIcon: ({ color }) => <Ionicons name="book" size={24} color={color} />,
+        }}
+      />
     </Tabs>
   );
 }

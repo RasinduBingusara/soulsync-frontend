@@ -174,5 +174,9 @@
         "send_button": "Send",
         "how_can_i_help": "Hello! How can I help you today?",
         "how_can_i_help_with_emotion": "Hello! How can I help you today? You seem to be feeling {{mood}} today!"
+    },
+    "learning_zone":{
+        "title": "Learning Zone",
+        "read_more" : "Read More"
     }
 }
