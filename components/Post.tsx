@@ -7,6 +7,8 @@ import { PostProps } from './custom-interface/CustomProps';
 import { ThemedView } from './ThemedView';
 import { ThemedText } from './ThemedText';
 import { ThemedInput } from './ThemedInput';
+import { ThemedTouchableOpacity } from './ThemedTouchableOpacity';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface Comment {
   id: string;
@@ -98,7 +100,7 @@ const Post = ({ id, content, mood, uid, email, isAnonymouse, profileName }: Post
     try {
       await runTransaction(db, async (transaction) => {
         // Get the current state of the post
-        const postDoc : any = await transaction.get(postRef);
+        const postDoc: any = await transaction.get(postRef);
         if (!postDoc.exists()) {
           return;
         }
@@ -125,7 +127,7 @@ const Post = ({ id, content, mood, uid, email, isAnonymouse, profileName }: Post
   };
 
   const renderCommentItem = ({ item }: any) => (
-    <ThemedView style={styles.commentItem}>
+    <ThemedView style={styles.commentItem} darkColor='#3f3f3fff'>
       <ThemedText style={styles.commentUser}>{item.userName || 'Anonymous'}</ThemedText>
       <ThemedText style={styles.commentText}>{item.comment}</ThemedText>
     </ThemedView>
@@ -175,7 +177,9 @@ const Post = ({ id, content, mood, uid, email, isAnonymouse, profileName }: Post
           <ThemedView style={styles.modalContent}>
             <ThemedView style={styles.modalHeader}>
               <ThemedText style={styles.headerTitle}>Comments</ThemedText>
-              <Button title="Close" onPress={() => { setIsModalVisible(false) }} />
+              <ThemedTouchableOpacity onPress={() => { setIsModalVisible(false) }}>
+                <FontAwesome name="close" size={25} color="#990000ff" />
+              </ThemedTouchableOpacity>
             </ThemedView>
 
             <FlatList
@@ -199,7 +203,9 @@ const Post = ({ id, content, mood, uid, email, isAnonymouse, profileName }: Post
                   <ActivityIndicator size={'small'} />
                 ) :
                   (
-                    <Button title="Post" onPress={handleComment} disabled={!commentText.trim()} />
+                    <ThemedTouchableOpacity onPress={handleComment} disabled={!commentText.trim()}>
+                      <FontAwesome name="send" size={25} color="#005499ff" />
+                    </ThemedTouchableOpacity>
                   )
               }
 
@@ -217,7 +223,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
-    marginVertical: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

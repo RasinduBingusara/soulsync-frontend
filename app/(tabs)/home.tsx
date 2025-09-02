@@ -212,7 +212,7 @@ function HomeScreen() {
             <InteractiveBlock title={t('home.journal')} iconName="book" onPress={() => { router.push('/(screen)/journal_create') }} />
             <InteractiveBlock title={t('home.tasks')} iconName="tasks" onPress={() => { router.push('/(screen)/task_create') }} />
             <InteractiveBlock title={t('home.community')} iconName="commenting" onPress={() => { router.push('/(screen)/post_create') }} />
-            <InteractiveBlock title={t('home.learning_zone')} iconName="graduation-cap" />
+            <InteractiveBlock title={t('home.learning_zone')} iconName="graduation-cap" onPress={() => { router.push('/(tabs)/learning-zone') }}/>
           </ThemedView>
         </ThemedView>
       </ScrollView>

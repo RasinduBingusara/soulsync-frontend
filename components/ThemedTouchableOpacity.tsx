@@ -8,15 +8,16 @@ export type ListViewProps = TouchableOpacityProps & {
     margin?: number;
     width?: number | `${number}%`;
     height?: number | `${number}%`;
+    backgroundVisible?: boolean;
 };
 
 export function ThemedTouchableOpacity(
-    { margin = 0,width,height, lightColor, darkColor, ...otherProps }: ListViewProps) {
+    { margin = 0,width,height, lightColor, darkColor,backgroundVisible = true, ...otherProps }: ListViewProps) {
     const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
     return (
         <TouchableOpacity
-            style={[{ backgroundColor, margin,width,height},styles.block]}
+            style={[{margin,width,height},styles.block,backgroundVisible ? { backgroundColor } : {}]}
             {...otherProps}
         />
     );

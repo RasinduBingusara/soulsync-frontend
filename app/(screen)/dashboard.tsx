@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet,  View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ScrollView, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PieChart from 'react-native-pie-chart';
 import { FontAwesome } from '@expo/vector-icons';
@@ -48,37 +48,9 @@ export default function Dashboard() {
     const [dailyMoods, setDailyMoods] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [seriseList, setSerise] = useState<Array<{ value: number, color: string }>>([]);
+    const [analysisText, setAnalysisText] = useState('');
+    const [isAnalysable, setIsAnalysable] = useState(false);
 
-    const getLast7DaysMoods = async (): Promise<DailyMood[]> => {
-        try {
-            const uid = getAuth().currentUser?.uid || '';
-            const storedMoods = await AsyncStorage.getItem('DailyMoods');
-            const moods: DailyMood[] = storedMoods ? JSON.parse(storedMoods) : [];
-
-            const last7DaysMoods: DailyMood[] = [];
-            const today = new Date();
-
-            for (let i = 0; i < 3; i++) {
-                // Find the mood entry for the specific day and user
-                const moodEntry = moods.find(
-                    (item) => item.uid === uid
-                );
-
-                if (moodEntry) {
-                    last7DaysMoods.push(moodEntry);
-                } else {
-                    null;
-                }
-            }
-
-            // Reverse the array to have the oldest day first, which is useful for charting
-            return last7DaysMoods.reverse();
-
-        } catch (error) {
-            console.error("Error fetching last 7 days moods:", error);
-            return [];
-        }
-    };
 
     const fetchDailyMoods = async () => {
         setLoading(true);
@@ -91,11 +63,61 @@ export default function Dashboard() {
             moods = moods.filter((item: any) => item.uid === uid);
             // Sort by date descending
             moods.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
-            setDailyMoods(moods);
+            setDailyMoods(moods.slice(0, 7));
+            setIsAnalysable(true);
         } catch (e) {
             console.error('Error loading daily moods:', e);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchAnalysis = async (moods: DailyMood[]) => {
+        setAnalysisText('Generating insights...');
+        if (moods.length === 0) {
+            setAnalysisText('No data to analyze. Please record some moods to get insights.');
+            return;
+        }
+
+        try {
+            const cachedAnalysis = await AsyncStorage.getItem('CachedAnalysis');
+            if (cachedAnalysis) {
+                const { text, timestamp } = JSON.parse(cachedAnalysis);
+                const oneDayInMs = 24 * 60 * 60 * 1000;
+                if (Date.now() - timestamp < oneDayInMs) {
+                    setAnalysisText(text);
+                    console.log('Using cached analysis from AsyncStorage.');
+                    return;
+                }
+            }
+
+            // If no valid cache, fetch a new analysis
+            const response = await fetch('http://192.168.8.100:8000/analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ moods: moods }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            const newAnalysis = data.analysis;
+            
+            // Save the new analysis to AsyncStorage with a timestamp
+            await AsyncStorage.setItem('CachedAnalysis', JSON.stringify({
+                text: newAnalysis,
+                timestamp: Date.now()
+            }));
+
+            setAnalysisText(newAnalysis);
+            setIsAnalysable(false);
+        } catch (error) {
+            console.error('Error fetching analysis:', error);
+            setAnalysisText('An error occurred while fetching analysis. Please try again later.');
         }
     };
 
@@ -111,7 +133,7 @@ export default function Dashboard() {
             }
 
             const counts: { [key: string]: number } = {
-                anger: 1,
+                anger: 0,
                 joy: 0,
                 sadness: 0,
                 fear: 0,
@@ -121,7 +143,7 @@ export default function Dashboard() {
             const today = new Date();
 
             for (let i = 0; i < days; i++) {
-                const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i);
+                const date = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i + 1);
                 const dateString = date.toISOString().slice(0, 10);
 
                 const moodEntry = moods.find(
@@ -168,6 +190,10 @@ export default function Dashboard() {
         };
         fetchMoods();
     }, []);
+
+    useEffect(() => {
+        fetchAnalysis(dailyMoods);
+    }, [isAnalysable]);
 
     return (
         <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
@@ -230,8 +256,9 @@ export default function Dashboard() {
                 <ThemedView style={styles.analysisCard}>
                     <ThemedText style={styles.cardTitle}>Insights & Analysis</ThemedText>
                     <ThemedText style={styles.analysisText}>
-                        This week, your morning moods show a slightly different pattern than your evening moods. A clear positive trend is visible towards the end of the week, suggesting your emotional well-being is on the rise.
+                        {analysisText}
                     </ThemedText>
+
                 </ThemedView>
             </ScrollView>
         </ThemedSafeAreaView>
