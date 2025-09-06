@@ -10,6 +10,7 @@ import { DailyMood } from '@/components/custom-interface/CustomProps';
 import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -50,6 +51,7 @@ export default function Dashboard() {
     const [seriseList, setSerise] = useState<Array<{ value: number, color: string }>>([]);
     const [analysisText, setAnalysisText] = useState('');
     const [isAnalysable, setIsAnalysable] = useState(false);
+    const { t } = useTranslation();
 
 
     const fetchDailyMoods = async () => {
@@ -73,9 +75,9 @@ export default function Dashboard() {
     };
 
     const fetchAnalysis = async (moods: DailyMood[]) => {
-        setAnalysisText('Generating insights...');
+        setAnalysisText(t('dashboard.analysis_generating'));
         if (moods.length === 0) {
-            setAnalysisText('No data to analyze. Please record some moods to get insights.');
+            setAnalysisText(t('dashboard.analysis_no_data'));
             return;
         }
 
@@ -117,7 +119,7 @@ export default function Dashboard() {
             setIsAnalysable(false);
         } catch (error) {
             console.error('Error fetching analysis:', error);
-            setAnalysisText('An error occurred while fetching analysis. Please try again later.');
+            setAnalysisText(t('dashboard.analysis_error'));
         }
     };
 
@@ -203,13 +205,13 @@ export default function Dashboard() {
                     <TouchableOpacity style={styles.backButton} onPress={() => { router.push('..') }}>
                         <FontAwesome name="arrow-left" size={24} color="#6b7280" />
                     </TouchableOpacity>
-                    <ThemedText style={styles.headerTitle}>Emotion Dashboard</ThemedText>
+                    <ThemedText style={styles.headerTitle}>{t('dashboard.header_title')}</ThemedText>
                 </ThemedView>
 
                 <ThemedView style={styles.chartCard}>
-                    <ThemedText style={styles.cardTitle}>Your Daily Moods</ThemedText>
+                    <ThemedText style={styles.cardTitle}>{t('dashboard.card_title_daily_moods')}</ThemedText>
                     {dailyMoods.length === 0 ? (
-                        <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded to display a chart.</ThemedText>
+                        <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>{t('dashboard.no_daily_moods_for_chart')}</ThemedText>
                     ) : (
                         dailyMoods.map((entry, idx) => (
                             <ThemedView key={idx} style={styles.dailyMoodRow} darkColor='#2727276e'>
@@ -232,9 +234,9 @@ export default function Dashboard() {
                 {/* Charts Container */}
                 <ThemedView style={styles.chartsContainer} backgroundVisible={false}>
                     <ThemedView style={styles.chartCard}>
-                        <ThemedText style={styles.cardTitle}>Monthly Emotion Distribution</ThemedText>
+                        <ThemedText style={styles.cardTitle}>{t('dashboard.card_title_monthly_distribution')}</ThemedText>
                         {dailyMoods.length === 0 ? (
-                            <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded.</ThemedText>
+                            <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>{t('dashboard.no_daily_moods_generic')}</ThemedText>
                         ) : (
 
                             seriseList[0] && (
@@ -258,7 +260,7 @@ export default function Dashboard() {
 
                 {/* Analysis Section */}
                 <ThemedView style={styles.analysisCard}>
-                    <ThemedText style={styles.cardTitle}>Insights & Analysis</ThemedText>
+                    <ThemedText style={styles.cardTitle}>{t('dashboard.card_title_analysis')}</ThemedText>
                     <ThemedText style={styles.analysisText}>
                         {analysisText}
                     </ThemedText>

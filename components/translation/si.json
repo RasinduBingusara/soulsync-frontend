@@ -158,16 +158,39 @@
         "email_placeholder": "name@example.com",
         "password_placeholder": "********"
     },
-    "chat":{
+    "chat": {
         "title": "චැට්",
         "placeholder": "ඔබේ පණිවිඩය මෙහි ඇතුළත් කරන්න...",
         "send_button": "යවන්න",
         "how_can_i_help": "හෙලෝ! අද ඔබට මට කෙසේ උදව් කළ හැකිද?",
         "how_can_i_help_with_emotion": "හෙලෝ! අද ඔබට මට කෙසේ උදව් කළ හැකිද? ඔබට අද {{mood}} බවක් දැනෙයි!"
-
     },
-    "learning_zone":{
+    "learning_zone": {
         "title": "ඉගෙනුම් කලාපය",
-        "read_more" : "තවත් කියවන්න"
+        "read_more": "තවත් කියවන්න"
+    },
+    "dashboard": {
+        "header_title": "හැඟීම් උපකරණ පුවරුව",
+        "card_title_daily_moods": "ඔබේ දෛනික මනෝභාවයන්",
+        "no_daily_moods_for_chart": "ප්‍රස්ථාරයක් පෙන්වීමට දෛනික මනෝභාවයන් වාර්තා කර නොමැත.",
+        "card_title_monthly_distribution": "මාසික හැඟීම් බෙදාහැරීම",
+        "no_daily_moods_generic": "දෛනික මනෝභාවයන් වාර්තා කර නොමැත.",
+        "card_title_analysis": "අවබෝධය සහ විශ්ලේෂණය",
+        "analysis_generating": "අවබෝධයන් ජනනය වෙමින් පවතී...",
+        "analysis_no_data": "විශ්ලේෂණය කිරීමට දත්ත නොමැත. කරුණාකර අවබෝධයක් ලබා ගැනීමට මනෝභාවයන් කිහිපයක් සටහන් කරන්න.",
+        "analysis_error": "විශ්ලේෂණය ලබා ගැනීමේදී දෝෂයක් සිදුවිය. කරුණාකර පසුව නැවත උත්සාහ කරන්න.",
+        "emotions": {
+            "anger": "කෝපය",
+            "fear": "බිය",
+            "joy": "සතුට",
+            "love": "ආදරය",
+            "neutral": "මධ්‍යස්ථ",
+            "sadness": "දුක"
+        },
+        "mood_categories": {
+            "negative": "සෘණාත්මක",
+            "neutral": "මධ්‍යස්ථ",
+            "positive": "ධනාත්මක"
+        }
     }
 }

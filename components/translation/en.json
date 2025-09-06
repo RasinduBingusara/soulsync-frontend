@@ -168,15 +168,39 @@
         "email_placeholder": "name@example.com",
         "password_placeholder": "********"
     },
-    "chat":{
+    "chat": {
         "title": "Chat",
         "placeholder": "Type your message...",
         "send_button": "Send",
         "how_can_i_help": "Hello! How can I help you today?",
         "how_can_i_help_with_emotion": "Hello! How can I help you today? You seem to be feeling {{mood}} today!"
     },
-    "learning_zone":{
+    "learning_zone": {
         "title": "Learning Zone",
-        "read_more" : "Read More"
+        "read_more": "Read More"
+    },
+    "dashboard": {
+        "header_title": "Emotion Dashboard",
+        "card_title_daily_moods": "Your Daily Moods",
+        "no_daily_moods_for_chart": "No daily moods recorded to display a chart.",
+        "card_title_monthly_distribution": "Monthly Emotion Distribution",
+        "no_daily_moods_generic": "No daily moods recorded.",
+        "card_title_analysis": "Insights & Analysis",
+        "analysis_generating": "Generating insights...",
+        "analysis_no_data": "No data to analyze. Please record some moods to get insights.",
+        "analysis_error": "An error occurred while fetching analysis. Please try again later.",
+        "emotions": {
+            "anger": "Anger",
+            "fear": "Fear",
+            "joy": "Joy",
+            "love": "Love",
+            "neutral": "Neutral",
+            "sadness": "Sadness"
+        },
+        "mood_categories": {
+            "negative": "Negative",
+            "neutral": "Neutral",
+            "positive": "Positive"
+        }
     }
 }
