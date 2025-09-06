@@ -1,11 +1,11 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { SplashScreen, Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { use, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import { getAuth, FirebaseAuthTypes, onAuthStateChanged as onAuthChanged } from '@react-native-firebase/auth';
 import { getLanguagePreference } from '@/components/custom-function/LanguagePreference';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +28,30 @@ export default function RootLayout() {
   const [user, setUser] = useState<SanitizedUser>(null)
   const [languageCode, setLanguageCode] = useState<string | null>(null);
   const { i18n } = useTranslation();
+
+  const [appIsReady, setAppIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      // Hide the splash screen once the app is ready
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
 
   const sanitizeUser = (user: FirebaseAuthTypes.User | null) => {
     if (!user) {

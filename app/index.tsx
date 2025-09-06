@@ -9,7 +9,7 @@ import { router } from 'expo-router';
 import { FirebaseError } from 'firebase/app';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -64,12 +64,26 @@ export default function Auth() {
             console.log('email: ', email);
             console.log('password: ', password);
             await signInWithEmailAndPassword(auth, email, password);
-            alert('Check your emails!')
             // router.push('/(tabs)/home');
         }
-        catch (error) {
-            const err = error as FirebaseError;
-            alert('Sign in failed: ' + err.message);
+        catch (error: any) {
+            let errorMessage = "Sign in failed. Please check your credentials.";
+            switch (error.code) {
+                case 'auth/wrong-password':
+                case 'auth/user-not-found':
+                    errorMessage = "Invalid email or password.";
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = "The email address is not valid.";
+                    break;
+                case 'auth/invalid-credential':
+                    errorMessage = "The supplied auth credential is incorrect";
+                    break;
+                default:
+                    errorMessage = `Sign in failed: ${error.message}`;
+                    break;
+            }
+            Alert.alert('Error', errorMessage);
         }
         finally {
             setLoading(false);

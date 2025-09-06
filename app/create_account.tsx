@@ -26,15 +26,45 @@ const CreateAccountScreen = () => {
     const [loading, setLoading] = useState(false);
 
     const auth = getAuth();
-    
+
     const handleCreateAccount = async () => {
+        
         if (password !== confirmPassword) {
-            Alert.alert(t('common.error'), t('create_account.passwords_do_not_match'));
+            Alert.alert('Passwords do not match');
             return;
         }
 
+        if (password.length < 8) {
+            Alert.alert("Password is too short. Must be at least 8 characters.");
+            return false;
+        }
+
+        // 2. Check for at least one uppercase letter
+        if (!/[A-Z]/.test(password)) {
+            Alert.alert("Password must contain at least one uppercase letter.");
+            return false;
+        }
+
+        // 3. Check for at least one lowercase letter
+        if (!/[a-z]/.test(password)) {
+            Alert.alert("Password must contain at least one lowercase letter.");
+            return false;
+        }
+
+        // 4. Check for at least one number
+        if (!/[0-9]/.test(password)) {
+            Alert.alert("Password must contain at least one number.");
+            return false;
+        }
+
+        // 5. Check for at least one special character
+        if (!/[^A-Za-z0-9]/.test(password)) {
+            Alert.alert("Password must contain at least one special character.");
+            return false;
+        }
+
         if (!username || !email || !password || !confirmPassword) {
-            Alert.alert(t('common.error'), t('create_account.all_fields_required'));
+            Alert.alert('All fields required');
             return;
         }
 
@@ -49,19 +79,29 @@ const CreateAccountScreen = () => {
             console.log("User created successfully:", user.uid);
             console.log("User's Display Name:", user.displayName);
 
-            Alert.alert(t('create_account.success'), t('create_account.check_your_email'));
-            router.push('/'); 
+            Alert.alert('Success', 'Account created successfully!');
+            router.push('/');
 
-        } catch (error) {
-            const err = error;
-
-            let errorMessage = t('create_account.registration_failed');
-        
-            Alert.alert(t('common.error'), errorMessage);
-            console.error(error);
-
+        } catch (error: any) {
+            // Handle specific Firebase Auth errors
+            let errorMessage = "Registration failed. Please try again.";
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    errorMessage = "This email is already in use. Please sign in or use a different email.";
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = "The email address is not valid.";
+                    break;
+                case 'auth/weak-password':
+                    errorMessage = "The password is too weak. Please use a stronger password.";
+                    break;
+                default:
+                    errorMessage = `Registration failed: ${error.message}`;
+                    break;
+            }
+            Alert.alert('Error', errorMessage);
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     };
 

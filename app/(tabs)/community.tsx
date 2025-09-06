@@ -101,10 +101,7 @@ function community() {
   }, [db])
 
   return (
-    <ThemedSafeAreaView style={styles.safeArea}>
-      <ThemedView style={styles.headerContainer}>
-        <ThemedText style={styles.headerTitle}>{t('community_list.title')}</ThemedText>
-      </ThemedView>
+    <ThemedView style={styles.safeArea}>
 
       {posts[0] ? (
         <FlatList
@@ -139,14 +136,14 @@ function community() {
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/post_create') }}>
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>
-    </ThemedSafeAreaView>
+    </ThemedView>
   )
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingHorizontal: 10
+    padding:10
   },
   scrollView: {
     paddingHorizontal: 16,
@@ -158,9 +155,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     justifyContent:'space-between'
-  },
-  backButton: {
-    padding: 8,
   },
   headerTitle: {
     fontSize: 24,

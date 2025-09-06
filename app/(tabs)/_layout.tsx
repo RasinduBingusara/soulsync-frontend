@@ -11,10 +11,11 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -24,13 +25,13 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            
+
             position: 'absolute',
           },
           default: {},
         }),
       }}>
-        
+
       <Tabs.Screen
         name="home"
         options={{
@@ -42,32 +43,36 @@ export default function TabLayout() {
       <Tabs.Screen
         name="community"
         options={{
-          title: 'Community',
+          title:  t('community_list.title') ,
           tabBarIcon: ({ color }) => <MaterialIcons name="groups" size={24} color={color} />,
+          headerShown: true,
         }}
       />
 
       <Tabs.Screen
         name="task-list"
         options={{
-          title: 'Tasks',
+          title: t('task_list.title'),
           tabBarIcon: ({ color }) => <FontAwesome5 name="tasks" size={24} color={color} />,
+          headerShown: true,
         }}
       />
 
       <Tabs.Screen
         name="journal-list"
         options={{
-          title: 'Journal',
+          title: t('journal_list.title'),
           tabBarIcon: ({ color }) => <Ionicons name="journal" size={24} color={color} />,
+          headerShown: true,
         }}
       />
 
       <Tabs.Screen
         name="learning-zone"
         options={{
-          title: 'Learning Zone',
+          title: t('learning_zone.title'),
           tabBarIcon: ({ color }) => <Ionicons name="book" size={24} color={color} />,
+          headerShown: true,
         }}
       />
     </Tabs>

@@ -100,10 +100,7 @@ export default function JournalList() {
 
 
   return (
-    <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
-      <ThemedView style={styles.headerContainer} backgroundVisible={false}>
-        <ThemedText style={styles.headerTitle}>{t('journal_list.title')}</ThemedText>
-      </ThemedView>
+    <ThemedView style={styles.safeArea} darkColor='#000000ff'>
       {displayedJournals.length > 0 ? (
         <FlatList
           data={displayedJournals}
@@ -135,32 +132,18 @@ export default function JournalList() {
       <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/journal_create') }}>
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>
-    </ThemedSafeAreaView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingHorizontal: 10
+    padding:10
   },
   scrollView: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#374151',
   },
   entriesList: {
     gap: 16,

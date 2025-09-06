@@ -44,29 +44,29 @@ export default function TaskList() {
 
     const getTasksSortedByTimeLeft = async () => {
         try {
-        const storedTasks = await AsyncStorage.getItem('Tasks');
-        const tasks: ITask[] = storedTasks ? JSON.parse(storedTasks) : [];
+            const storedTasks = await AsyncStorage.getItem('Tasks');
+            const tasks: ITask[] = storedTasks ? JSON.parse(storedTasks) : [];
 
-        // Check if the data is a valid array
-        if (!Array.isArray(tasks)) {
-            console.error("Stored data is not a valid task array.");
-            return [];
+            // Check if the data is a valid array
+            if (!Array.isArray(tasks)) {
+                console.error("Stored data is not a valid task array.");
+                return [];
+            }
+
+            // Sort the tasks directly by their due date timestamps.
+            // `getTime()` converts the date and time string into a number (milliseconds),
+            // allowing for a direct numerical comparison.
+            tasks.sort((a: ITask, b: ITask) => {
+                const dateA = new Date(a.dateTime).getTime();
+                const dateB = new Date(b.dateTime).getTime();
+                return dateA - dateB;
+            });
+
+            console.log("Tasks sorted by due date successfully.");
+            setLatestTasks(tasks);
+        } catch (error) {
+            console.error("Error retrieving and sorting tasks:", error);
         }
-
-        // Sort the tasks directly by their due date timestamps.
-        // `getTime()` converts the date and time string into a number (milliseconds),
-        // allowing for a direct numerical comparison.
-        tasks.sort((a:ITask, b:ITask) => {
-            const dateA = new Date(a.dateTime).getTime();
-            const dateB = new Date(b.dateTime).getTime();
-            return dateA - dateB;
-        });
-
-        console.log("Tasks sorted by due date successfully.");
-        setLatestTasks(tasks);
-    } catch (error) {
-        console.error("Error retrieving and sorting tasks:", error);
-    }
     };
 
     const deleteTask = async (id: string) => {
@@ -117,13 +117,8 @@ export default function TaskList() {
     }, []);
 
     return (
-        <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
+        <ThemedView style={styles.safeArea} darkColor='#000000ff'>
             <ThemedView style={styles.container} backgroundVisible={false}>
-
-                {/* Header Section */}
-                <ThemedView style={styles.headerContainer} backgroundVisible={false}>
-                    <ThemedText style={styles.headerTitle}>{t('task_list.title')}</ThemedText>
-                </ThemedView>
                 {latestTasks.length > 0 ? (
                     <FlatList
                         data={latestTasks}
@@ -150,7 +145,7 @@ export default function TaskList() {
             <TouchableOpacity style={styles.fab} onPress={() => { router.push('/(screen)/task_create') }}>
                 <FontAwesome name="plus" size={24} color="white" />
             </TouchableOpacity>
-        </ThemedSafeAreaView>
+        </ThemedView>
     );
 }
 
@@ -161,17 +156,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
-    },
-    headerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#374151',
     },
     addButton: {
         flexDirection: 'row',

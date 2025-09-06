@@ -128,17 +128,17 @@
         "calm": "Calm"
     },
     "task_list": {
-        "title": "Task List",
+        "title": "Tasks",
         "no_tasks": "No tasks available",
         "add_task": "Add a new task"
     },
     "journal_list": {
-        "title": "Journal List",
+        "title": "Journals",
         "no_entries": "No journal entries available",
         "add_entry": "Add a new journal entry"
     },
     "community_list": {
-        "title": "Community List",
+        "title": "Community",
         "no_entries": "No community entries available",
         "add_entry": "Add a new community entry"
     },

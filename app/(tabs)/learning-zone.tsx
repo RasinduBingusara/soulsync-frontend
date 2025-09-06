@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, ScrollView, TouchableOpacity, ActivityIndicator, Linking,FlatList } from 'react-native';
+import { StyleSheet, Text, View, TextInput, ScrollView, TouchableOpacity, ActivityIndicator, Linking, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import 'react-native-url-polyfill/auto'; // Required for fetch in older versions of React Native
@@ -103,28 +103,24 @@ export default function LearningZone() {
     );
 
     return (
-        <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
+        <ThemedView style={styles.safeArea} darkColor='#000000ff'>
             <ThemedView style={styles.container} backgroundVisible={false}>
-                {/* Header */}
-                <ThemedView style={styles.headerContainer} backgroundVisible={false}>
-                    <ThemedText style={styles.headerTitle}>{t('learning_zone.title')}</ThemedText>
-                </ThemedView>
                 {loading ? (
-                        <ActivityIndicator size="large" color="#4f46e5" />
+                    <ActivityIndicator size="large" color="#4f46e5" />
+                ) : (
+                    filteredArticles.length > 0 ? (
+                        <FlatList
+                            data={filteredArticles}
+                            renderItem={renderArticleItem}
+                            keyExtractor={(item) => item.id}
+                            contentContainerStyle={{ gap: 10, paddingBottom: 10 }}
+                        />
                     ) : (
-                        filteredArticles.length > 0 ? (
-                            <FlatList
-                                data={filteredArticles}
-                                renderItem={renderArticleItem}
-                                keyExtractor={(item) => item.id}
-                                contentContainerStyle={{ gap: 10,paddingBottom:10 }}
-                            />
-                        ) : (
-                            <Text style={styles.noArticlesText}>No articles found.</Text>
-                        )
-                    )}
+                        <Text style={styles.noArticlesText}>No articles found.</Text>
+                    )
+                )}
             </ThemedView>
-        </ThemedSafeAreaView>
+        </ThemedView>
     );
 }
 
@@ -133,23 +129,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     container: {
-        padding: 16,
-    },
-    headerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-    },
-    headerTitle: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#374151',
-    },
-    backButton: {
-        fontSize: 24,
-        color: '#6b7280',
-        padding: 8,
+        padding: 10,
     },
     searchBarContainer: {
         marginBottom: 24,

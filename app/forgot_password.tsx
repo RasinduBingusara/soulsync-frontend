@@ -1,4 +1,8 @@
+import { ThemedInput } from '@/components/ThemedInput';
+import { ThemedLabel } from '@/components/ThemedLabel';
 import { ThemedSafeAreaView } from '@/components/ThemedSafeAreaView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { getAuth, sendPasswordResetEmail } from "@react-native-firebase/auth";
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -65,24 +69,24 @@ export default function ForgotPasswordScreen() {
     };
 
     return (
-        <ThemedSafeAreaView style={styles.safeArea}>
+        <ThemedSafeAreaView style={styles.safeArea} darkColor='#000000ff'>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                    <View style={styles.headerContainer}>
-                        <Text style={styles.headerTitle}>Forgot Password</Text>
-                    </View>
+                    <ThemedView style={styles.headerContainer} backgroundVisible={false}>
+                        <ThemedText style={styles.headerTitle}>Forgot Password</ThemedText>
+                    </ThemedView>
 
-                    <View style={styles.formSection}>
-                        <Text style={styles.instructions}>
+                    <ThemedView style={styles.formSection}>
+                        <ThemedText style={styles.instructions}>
                             Enter your email address and we'll send you a link to reset your password.
-                        </Text>
+                        </ThemedText>
 
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.inputLabel}>Email Address</Text>
-                            <TextInput
+                        <ThemedView style={styles.inputGroup}>
+                            <ThemedLabel style={styles.inputLabel}>Email Address</ThemedLabel>
+                            <ThemedInput
                                 style={styles.textInput}
                                 placeholder="you@example.com"
                                 placeholderTextColor="#9ca3af"
@@ -91,11 +95,11 @@ export default function ForgotPasswordScreen() {
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                             />
-                        </View>
+                        </ThemedView>
 
                         {message ? (
                             <View style={[styles.messageBox, isError ? styles.errorBox : styles.successBox]}>
-                                <Text style={isError ? styles.errorMessageText : styles.successMessageText}>{message}</Text>
+                                <ThemedText style={isError ? styles.errorMessageText : styles.successMessageText}>{message}</ThemedText>
                             </View>
                         ) : null}
 
@@ -111,14 +115,14 @@ export default function ForgotPasswordScreen() {
                             )}
                         </TouchableOpacity>
 
-                        <View style={styles.backToLoginContainer}>
-                            <Text style={styles.backToLoginText}>Remember your password? </Text>
+                        <ThemedView style={styles.backToLoginContainer}>
+                            <ThemedText style={styles.backToLoginText}>Remember your password? </ThemedText>
                             <TouchableOpacity onPress={() => { router.push('/') }}>
                                 <Text style={styles.loginLink}>Log in</Text>
                             </TouchableOpacity>
-                        </View>
+                        </ThemedView>
 
-                    </View>
+                    </ThemedView>
                 </ScrollView>
             </KeyboardAvoidingView>
         </ThemedSafeAreaView>
@@ -128,7 +132,6 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f3f4f6',
     },
     scrollViewContent: {
         flexGrow: 1,
@@ -190,7 +193,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 16,
         fontSize: 14,
-        color: '#1f2937',
     },
     messageBox: {
         padding: 12,

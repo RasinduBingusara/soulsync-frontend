@@ -106,7 +106,7 @@ export default function Dashboard() {
 
             const data = await response.json();
             const newAnalysis = data.analysis;
-            
+
             // Save the new analysis to AsyncStorage with a timestamp
             await AsyncStorage.setItem('CachedAnalysis', JSON.stringify({
                 text: newAnalysis,
@@ -209,7 +209,7 @@ export default function Dashboard() {
                 <ThemedView style={styles.chartCard}>
                     <ThemedText style={styles.cardTitle}>Your Daily Moods</ThemedText>
                     {dailyMoods.length === 0 ? (
-                        <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded.</ThemedText>
+                        <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded to display a chart.</ThemedText>
                     ) : (
                         dailyMoods.map((entry, idx) => (
                             <ThemedView key={idx} style={styles.dailyMoodRow} darkColor='#2727276e'>
@@ -228,18 +228,22 @@ export default function Dashboard() {
                     )}
                 </ThemedView>
 
+
                 {/* Charts Container */}
                 <ThemedView style={styles.chartsContainer} backgroundVisible={false}>
                     <ThemedView style={styles.chartCard}>
                         <ThemedText style={styles.cardTitle}>Monthly Emotion Distribution</ThemedText>
-                        {
+                        {dailyMoods.length === 0 ? (
+                            <ThemedText style={{ color: '#6b7280', marginTop: 12 }}>No daily moods recorded.</ThemedText>
+                        ) : (
+
                             seriseList[0] && (
                                 <PieChart
                                     widthAndHeight={250}
                                     series={seriseList}
                                 />
                             )
-                        }
+                        )}
 
                         <ThemedView style={styles.pieContainer}>
                             {Object.keys(emotions).map((emotion, index) => (
